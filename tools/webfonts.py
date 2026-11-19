@@ -2,7 +2,7 @@
 
     FONTS/.venv/bin/python tools/webfonts.py FONTS [full]
 
-FONTS is a checkout of https://github.com/zjlgdx/pinboard-fonts. This writes
+FONTS is a checkout of https://github.com/zjlgdx/yisu-fonts. This writes
 
     public/fonts/<family>-<weight>.woff2   what index.html itself shows in that font
     public/fonts/huasha-400-t.woff2        the rest of the texts under 讀全文
@@ -31,8 +31,8 @@ from fontTools.ttLib import TTFont
 
 SITE = Path(__file__).resolve().parent.parent
 PUB = SITE / 'public'
-FAMILIES = {'yinni': ('Yisu Yinni', 'PinboardTypewriter'), 'huasha': ('Yisu Huasha', 'PinboardBallpoint'),
-            'louhen': ('Yisu Louhen', 'PinboardMarker')}
+FAMILIES = {'yinni': ('Yisu Yinni', 'YisuYinni'), 'huasha': ('Yisu Huasha', 'YisuHuasha'),
+            'louhen': ('Yisu Louhen', 'YisuLouhen')}
 WEIGHTS = {400: 'Regular', 700: 'Bold'}
 SIZE = 300
 # In every family whatever the page says: letters, figures, 注音 and the marks of a sentence.
