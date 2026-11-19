@@ -175,7 +175,10 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 .cine-label { position: absolute; left: max(3%, env(safe-area-inset-left, 0px)); top: calc(3.4% + env(safe-area-inset-top, 0px)); font-size: 14px; line-height: 1; letter-spacing: .32em; color: var(--cine-soft); transition: opacity .8s; }
 .cine-label i { font-style: normal; margin-left: 1.2em; }
 .cine-view { position: absolute; left: 0; right: 0; top: 10%; height: 71%; overflow: hidden; transition: opacity 1s; }
-#cine-roll { position: absolute; left: 0; top: 8px; display: block; background: var(--cine-paper); box-shadow: 0 -8px 0 var(--cine-band), 0 8px 0 var(--cine-band); transform-origin: 0 0; will-change: transform; }
+/* Two canvases: the stretch of the scroll being written, at full size, and for the closing
+   shot the whole scroll small (--mount keeps its mount in scale). */
+#cine-roll, #cine-far { position: absolute; left: 0; top: 8px; display: block; background: var(--cine-paper); box-shadow: 0 calc(var(--mount, 8px) * -1) 0 var(--cine-band), 0 var(--mount, 8px) 0 var(--cine-band); transform-origin: 0 0; will-change: transform; }
+#cine-far { opacity: 0; }
 .cine-card { position: absolute; inset: 0; display: flex; flex-direction: row-reverse; align-items: center; justify-content: center; gap: 2.4%; transition: opacity .8s; }
 .cine-card canvas, .cine-caption canvas { display: block; }
 #cine-by { align-self: flex-end; }
@@ -189,7 +192,9 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 .cine[data-phase="title"] .cine-view, .cine[data-phase="title"] .cine-label, .cine[data-phase="title"] .cine-caption { opacity: 0; }
 .cine:not([data-phase="title"]) .cine-card { opacity: 0; }
 .cine[data-phase="wide"] .cine-caption, .cine[data-phase="end"] .cine-caption, .cine.nocap .cine-caption { opacity: 0; }
-.cine[data-phase="wide"] #cine-roll, .cine[data-phase="end"] #cine-roll { transition: transform 3.4s cubic-bezier(.4, 0, .2, 1); }
+.cine[data-phase="wide"] #cine-far, .cine[data-phase="end"] #cine-far { opacity: 1; }
+.cine[data-phase="wide"] #cine-roll, .cine[data-phase="wide"] #cine-far, .cine[data-phase="end"] #cine-far { transition: transform 3.4s cubic-bezier(.4, 0, .2, 1); }
+.cine.settled #cine-roll { opacity: 0; transition: transform 3.4s cubic-bezier(.4, 0, .2, 1), opacity 1.2s; }
 /* A narrow screen: the buttons take two rows, so the band above the scroll is taller, and the
    name shows when the buttons have gone. A short one (a phone on its side): smaller buttons. */
 @media (max-width: 620px) {
@@ -247,7 +252,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
         <span class="note"><span id="progress"></span><span id="note"></span></span>
         <div class="ctl" id="more" hidden>
           <span class="seg" role="group" aria-label="換一卷">
-            <button id="piece-lanting" data-piece="lanting" aria-pressed="true">蘭亭集序</button><button id="piece-chibi" data-piece="chibi" aria-pressed="false">前赤壁賦</button>
+            <button id="piece-lanting" data-piece="lanting" aria-pressed="true">蘭亭集序</button><button id="piece-chibi" data-piece="chibi" aria-pressed="false">前赤壁賦</button><button id="piece-tengwang" data-piece="tengwang" aria-pressed="false">滕王閣序</button>
           </span>
           <span class="seg" role="group" aria-label="速度">
             <button id="slow" data-rate="0.6" aria-pressed="false">慢</button><button id="mid" data-rate="1.5" aria-pressed="true">中</button><button id="fast" data-rate="4" aria-pressed="false">快</button>
@@ -262,7 +267,16 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
         <p id="text-lanting" class="far">永和九年，歲在癸丑，暮春之初，會于會稽山陰之蘭亭，脩禊事也。群賢畢至，少長咸集。此地有崇山峻領，茂林脩竹；又有清流激湍，暎帶左右，引以為流觴曲水，列坐其次。雖無絲竹管弦之盛，一觴一詠，亦足以暢敘幽情。是日也，天朗氣清，惠風和暢，仰觀宇宙之大，俯察品類之盛，所以遊目騁懷，足以極視聽之娛，信可樂也。夫人之相與，俯仰一世，或取諸懷抱，悟言一室之內；或因寄所託，放浪形骸之外。雖趣舍萬殊，靜躁不同，當其欣於所遇，暫得於己，快然自足，不知老之將至。及其所之既倦，情隨事遷，感慨係之矣。向之所欣，俛仰之間，已為陳迹，猶不能不以之興懷。況脩短隨化，終期於盡。古人云：「死生亦大矣。」豈不痛哉！每攬昔人興感之由，若合一契，未嘗不臨文嗟悼，不能喻之於懷。固知一死生為虛誕，齊彭殤為妄作。後之視今，亦猶今之視昔，悲夫！故列敘時人，錄其所述，雖世殊事異，所以興懷，其致一也。後之攬者，亦將有感於斯文。</p>
         <h3>前赤壁賦（開頭）<small>蘇軾 · 北宋元豐五年</small></h3>
         <p id="text-chibi" class="far">壬戌之秋，七月既望，蘇子與客泛舟遊於赤壁之下。清風徐來，水波不興。舉酒屬客，誦明月之詩，歌窈窕之章。少焉，月出於東山之上，徘徊於斗牛之間。白露橫江，水光接天。縱一葦之所如，凌萬頃之茫然。浩浩乎如馮虛御風，而不知其所止；飄飄乎如遺世獨立，羽化而登仙。</p>
-        <p class="from" style="margin-top:12px">《蘭亭集序》依神龍本的寫法：脩、暎、俛、攬、領、迹。</p>
+        <h3>滕王閣序<small>王勃 · 唐上元二年</small></h3>
+        <p id="text-tengwang" class="far">豫章故郡，洪都新府。星分翼軫，地接衡廬。襟三江而帶五湖，控蠻荊而引甌越。物華天寶，龍光射牛斗之墟；人傑地靈，徐孺下陳蕃之榻。雄州霧列，俊采星馳。臺隍枕夷夏之交，賓主盡東南之美。都督閻公之雅望，棨戟遙臨；宇文新州之懿範，襜帷暫駐。十旬休假，勝友如雲。千里逢迎，高朋滿座。騰蛟起鳳，孟學士之詞宗；紫電青霜，王將軍之武庫。家君作宰，路出名區。童子何知？躬逢勝餞。<br>
+          時維九月，序屬三秋。潦水盡而寒潭清，煙光凝而暮山紫。儼驂騑於上路，訪風景於崇阿。臨帝子之長洲，得天人之舊館。層臺聳翠，上出重霄；飛閣流丹，下臨無地。鶴汀鳧渚，窮島嶼之縈迴；桂殿蘭宮，即岡巒之體勢。<br>
+          披繡闥，俯雕甍。山原曠其盈視，川澤紆其駭矚。閭閻撲地，鐘鳴鼎食之家；舸艦彌津，青雀黃龍之舳。雲銷雨霽，彩徹區明。落霞與孤鶩齊飛，秋水共長天一色。漁舟唱晚，響窮彭蠡之濱；雁陣驚寒，聲斷衡陽之浦。<br>
+          遙襟甫暢，逸興遄飛。爽籟發而清風生，纖歌凝而白雲遏。睢園綠竹，氣凌彭澤之樽；鄴水朱華，光照臨川之筆。四美具，二難並。窮睇眄於中天，極娛遊於暇日。天高地迥，覺宇宙之無窮；興盡悲來，識盈虛之有數。望長安於日下，目吳會於雲間。地勢極而南溟深，天柱高而北辰遠。關山難越，誰悲失路之人；萍水相逢，盡是他鄉之客。懷帝閽而不見，奉宣室以何年？<br>
+          嗟乎！時運不齊，命途多舛。馮唐易老，李廣難封。屈賈誼於長沙，非無聖主；竄梁鴻於海曲，豈乏明時？所賴君子安貧，達人知命。老當益壯，寧移白首之心；窮且益堅，不墜青雲之志。酌貪泉而覺爽，處涸轍以猶歡。北海雖賒，扶搖可接；東隅已逝，桑榆非晚。孟嘗高潔，空餘報國之情；阮籍猖狂，豈效窮途之哭？<br>
+          勃，三尺微命，一介書生，無路請纓，等終軍之弱冠；有懷投筆，慕宗愨之長風。捨簪笏於百齡，奉晨昏於萬里。非謝家之寶樹，接孟氏之芳鄰。他日趨庭，叨陪鯉對；今茲捧袂，喜託龍門。楊意不逢，撫凌雲而自惜；鍾期既遇，奏流水以何慚？<br>
+          嗚乎！勝地不常，盛筵難再。蘭亭已矣，梓澤丘墟。臨別贈言，幸承恩於偉餞；登高作賦，是所望於群公。敢竭鄙懷，恭疏短引。一言均賦，四韻俱成。請灑潘江，各傾陸海雲爾。<br>
+          滕王高閣臨江渚，佩玉鳴鸞罷歌舞。畫棟朝飛南浦雲，珠簾暮捲西山雨。閒雲潭影日悠悠，物換星移幾度秋。閣中帝子今何在，檻外長江空自流。</p>
+        <p class="from" style="margin-top:12px">《蘭亭集序》依神龍本的寫法：脩、暎、俛、攬、領、迹。《滕王閣序》連同篇末的詩。</p>
       </details>
     </div>
     <div class="titlecol">
@@ -375,8 +389,8 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 
 <div class="cine" id="cine" hidden data-phase="title" tabindex="-1" role="dialog" aria-modal="true" aria-label="觀影">
   <div class="cine-moon" aria-hidden="true"></div>
-  <div class="cine-label" id="cine-label" aria-hidden="true"><b data-piece="lanting">蘭亭集序<i>王羲之</i></b><b data-piece="chibi">前赤壁賦<i>蘇軾</i></b></div>
-  <div class="cine-view" id="cine-view"><canvas id="cine-roll" role="img"></canvas></div>
+  <div class="cine-label" id="cine-label" aria-hidden="true"><b data-piece="lanting">蘭亭集序<i>王羲之</i></b><b data-piece="chibi">前赤壁賦<i>蘇軾</i></b><b data-piece="tengwang">滕王閣序<i>王勃</i></b></div>
+  <div class="cine-view" id="cine-view"><canvas id="cine-far" aria-hidden="true"></canvas><canvas id="cine-roll" role="img"></canvas></div>
   <div class="cine-card" aria-hidden="true"><canvas id="cine-title"></canvas><canvas id="cine-by"></canvas></div>
   <div class="cine-caption" aria-hidden="true"><canvas id="cine-sub"></canvas></div>
   <div class="cine-end ctl" id="cine-end" hidden><button id="cine-again">再看一遍</button></div>
@@ -399,7 +413,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 const S = window.YISU_STROKES || {};
 // The logo's 點: one stroke, a grain of millet and the first stroke of 永.
 S[''] = [['D', [380, 230, 450, 300, 520, 390, 575, 500, 600, 640, 590, 740]]];
-let DPR = Math.min(2, window.devicePixelRatio || 1);     // the viewing mode lowers it for its one long canvas
+const DPR = Math.min(2, window.devicePixelRatio || 1);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- the three pens, from the fonts' own cuts ---------- */
@@ -510,9 +524,9 @@ function glyph(ctx, ch, pk, bold, ox, oy, cell) {
   for (const st of g) stamp(ctx, g, st, 0, st.n, pk, bold, ox, oy);
   wear(ctx, ch, pk, cell, ox, oy); return true;
 }
-function fit(cv, w, h) {
-  cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR);
-  const ctx = cv.getContext('2d'); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); return ctx;
+function fit(cv, w, h, dpr = DPR) {
+  cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
 }
 /* Static words: <canvas class="ink" data-t data-pen data-cell [data-h] [data-bold] [data-color]> */
 function inkAll(root) {
@@ -554,7 +568,12 @@ class Writer {
     if (o.tail) { const parts = [].concat(o.tail), all = parts.join(''); for (const part of all.length <= per ? [all] : parts) for (let q = 0; q < part.length; q += per) lines.push(part.slice(q, q + per)); }
     const pitch = c * 1.3, extra = lines.length ? o.cell * 0.6 + (lines.length - 1) * pitch + o.cell * 1.3 + o.gap * 2 : 0;
     this.W = Math.max(o.minW || 0, this.cols * (o.cell + o.gap) - o.gap + o.pad * 2 + extra); this.H = o.rows * o.cell + o.pad * 2 + (o.hang || 0);
-    this.ctx = fit(this.cv, this.W, this.H);
+    // The canvas is the whole scroll, or with o.view (px) a window that wide on it, which see()
+    // moves: a long text at a large size is wider than any canvas a browser will make. Either
+    // way it stays inside what browsers, phones above all, will allocate.
+    this.cw = o.view ? Math.min(this.W, Math.round(o.view)) : this.W;
+    this.dpr = Math.max(0.75, Math.min(DPR, 15500 / this.cw, Math.sqrt(16e6 / (this.cw * this.H))));
+    this.ctx = fit(this.cv, this.cw, this.H, this.dpr); this.px = 0; this.ox = 0;
     this.items = chars.map((ch, i) => { const [col, row] = at[i]; return { ch, cell: o.cell, row, x: this.W - o.pad - (col + 1) * o.cell - col * o.gap, y: o.pad + row * o.cell - (row === o.rows ? o.cell * 0.18 : 0) }; });   // a hung mark tucks in
     if (lines.length) {                 // one column on from the text, then the seal: under the last column, or beside it
       const x0 = this.W - o.pad - this.cols * (o.cell + o.gap) - o.gap - c;
@@ -565,25 +584,45 @@ class Writer {
     }
   }
   reset(n = 0) {
-    this.ctx.clearRect(0, 0, this.W, this.H); this.i = 0; this.s = 0; this.p = 0; this.wait = 0; this.done = false;
-    this.ctx.fillStyle = this.o.color;
-    for (; this.i < Math.min(n, this.items.length); this.i++) this.whole(this.items[this.i]);
-    this.o.onMove && this.o.onMove(this);
+    this.i = Math.min(n, this.items.length); this.s = 0; this.p = 0; this.wait = 0; this.done = false;
+    this.redraw(); this.o.onMove && this.o.onMove(this);
   }
   finish() { this.reset(this.items.length); this.done = true; this.o.onDone && this.o.onDone(this); }
-  whole(it) {
-    if (it.seal) return this.seal(it);
-    this.ctx.fillStyle = this.o.color; glyph(this.ctx, it.ch, this.o.pen, this.o.bold, it.x, it.y, it.cell);
+  redraw() { this.ctx.clearRect(0, 0, this.W, this.H); this.ink(this.ctx, this.ox, this.ox + this.cw); }
+  /* What is written so far of the scroll between a and b, at k times its size: whole characters,
+     and the strokes of the one the pen is in. */
+  ink(c, a, b, k = 1) {
+    const reach = it => it.x + it.cell * 1.2 > a && it.x - it.cell * 0.2 < b;
+    for (let q = 0; q < this.i && q < this.items.length; q++) if (reach(this.items[q])) this.whole(this.items[q], c, k);
+    const it = this.items[this.i], g = it && !it.seal && (this.s || this.p) && reach(it) && prepare(it.ch, this.o.pen, it.cell * k);
+    if (!g) return;
+    c.fillStyle = this.o.color;
+    for (let q = 0; q <= this.s; q++) stamp(c, g, g[q], 0, q < this.s ? g[q].n : Math.round(this.p * g[q].n / prepare(it.ch, this.o.pen, it.cell)[q].n), this.o.pen, this.o.bold, it.x * k, it.y * k);
   }
-  seal(it) {
-    const c = this.ctx, s = it.cell, h = s * 2.05; c.save(); c.fillStyle = this.o.sealColor || '#b3362b';
-    c.beginPath(); c.roundRect(it.x, it.y, s, h, s * 0.1); c.fill(); c.fillStyle = this.o.sealInk || '#f6efe6';
-    glyph(c, '一', 'rain', 1, it.x + s * 0.06, it.y + s * 0.07, s * 0.88); glyph(c, '粟', 'rain', 1, it.x + s * 0.06, it.y + s * 1.05, s * 0.88); c.restore();
+  whole(it, c = this.ctx, k = 1) {
+    if (it.seal) return this.seal(it, c, k);
+    c.fillStyle = this.o.color; glyph(c, it.ch, this.o.pen, this.o.bold, it.x * k, it.y * k, it.cell * k);
   }
-  setPen(pk) {                          // everything written so far, again in the other pen
-    this.o.pen = pk; const upto = this.i; this.ctx.clearRect(0, 0, this.W, this.H);
-    for (let q = 0; q < upto && q < this.items.length; q++) this.whole(this.items[q]);
-    this.s = 0; this.p = 0;
+  seal(it, c = this.ctx, k = 1) {
+    const s = it.cell * k, x = it.x * k, y = it.y * k, h = s * 2.05; c.save(); c.fillStyle = this.o.sealColor || '#b3362b';
+    c.beginPath(); c.roundRect(x, y, s, h, s * 0.1); c.fill(); c.fillStyle = this.o.sealInk || '#f6efe6';
+    glyph(c, '一', 'rain', 1, x + s * 0.06, y + s * 0.07, s * 0.88); glyph(c, '粟', 'rain', 1, x + s * 0.06, y + s * 1.05, s * 0.88); c.restore();
+  }
+  setPen(pk) { this.o.pen = pk; this.s = 0; this.p = 0; this.redraw(); }     // everything written so far, again in the other pen
+  /* Keep the scroll from a to b on the canvas. Where the window has to move, what it already
+     holds moves with it as it is, and only the strip that comes into it is written again. */
+  see(a, b) {
+    if (this.cw >= this.W || a >= this.ox && b <= this.ox + this.cw) return;
+    // most of the spare canvas goes to the left, where the writing is headed
+    const to = Math.round(Math.max(0, Math.min(this.W - this.cw, a - Math.max(0, this.cw - (b - a)) * 0.7)) * this.dpr);
+    const c = this.ctx, d = this.px - to, wide = this.cv.width;
+    if (!d) return;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    if (Math.abs(d) < wide) { c.globalCompositeOperation = 'copy'; c.drawImage(this.cv, d, 0); } else c.clearRect(0, 0, wide, this.cv.height);
+    c.restore();
+    this.px = to; this.ox = to / this.dpr; c.setTransform(this.dpr, 0, 0, this.dpr, -to, 0);
+    const from = (d > 0 ? to : Math.max(to, to + wide + d)) / this.dpr, upto = (d > 0 ? Math.min(to + d, to + wide) : to + wide) / this.dpr;
+    c.save(); c.beginPath(); c.rect(from, 0, upto - from, this.H); c.clip(); this.ink(c, from, upto); c.restore();
   }
   /* What a character costs to write: [ms that scale with the rate, ms that don't (a stroke ends
      on a frame, though the pause after it gives most of that back)]. The narration paces the
@@ -657,11 +696,13 @@ const YEAR = ganzhi();
 const PIECES = {
   lanting: { text: text('text-lanting'), tail: ['王羲之蘭亭集序', '歲在' + YEAR + '一粟書'], label: '一筆一劃寫出的《蘭亭集序》', note: '王羲之《蘭亭集序》', name: '蘭亭集序', by: '王羲之' },
   chibi: { text: text('text-chibi'), tail: ['蘇軾前赤壁賦', '歲在' + YEAR + '一粟書'], label: '一筆一劃寫出的《前赤壁賦》', note: '蘇軾《前赤壁賦》開頭', name: '前赤壁賦', by: '蘇軾' },
+  tengwang: { text: text('text-tengwang'), tail: ['王勃滕王閣序', '歲在' + YEAR + '一粟書'], label: '一筆一劃寫出的《滕王閣序》', note: '王勃《滕王閣序》', name: '滕王閣序', by: '王勃' },
 };
 const LIB = [...$('cells').dataset.spec];
 const st = { mode: '', piece: 'lanting', picked: false, pen: 'sand', char: '永', sound: false, read: false, rate: 1.5, playing: true, asked: false, touched: 0, width: 0 };
 const W = {};
 const rain = { grains: [], sparks: [], ctx: null, top: null, w: 0, h: 0, color: '#b08020', alpha: 1, clock: 0 };
+const PICK = Object.keys(PIECES).map(k => 'piece-' + k);
 const press = (ids, on) => { for (const id of ids) $(id).setAttribute('aria-pressed', id === on); };
 const seen = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
   for (const e of es) {
@@ -836,7 +877,7 @@ function sync(force) {
   if (m === st.mode && !force) return;
   const was = st.piece;
   if (m !== st.mode && !st.picked) st.piece = m === 'dark' ? 'chibi' : 'lanting';
-  st.mode = m; press(['theme-light', 'theme-dark'], 'theme-' + m); press(['piece-lanting', 'piece-chibi'], 'piece-' + st.piece);
+  st.mode = m; press(['theme-light', 'theme-dark'], 'theme-' + m); press(PICK, 'piece-' + st.piece);
   if (st.piece !== was && !force) playing(true);
   init(st.piece === was); music();
 }
@@ -846,7 +887,7 @@ function restart(n) { const sc = $('scroll'); vo.stop(); st.asked = true; playin
    A title written in the middle of the screen; then the text, six to a column (eight on an
    upright screen), with the sentence being written as a caption; then the whole scroll, end to
    end. It reads aloud and plays the music unless the reader turns them off there. */
-const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null };
+const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, shot: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null };
 const CINE_BAND = 8;                    // the mount above and below the paper, as the styles draw it
 const cineLater = (fn, ms) => { clearTimeout(cine.timer); cine.timer = setTimeout(fn, ms); };
 function cinePhase(p) {                 // title, roll, wide (pulling back), end
@@ -884,25 +925,21 @@ function cineByline() {
 function cineLayout(keep) {
   const box = $('cine'), view = $('cine-view'), piece = PIECES[st.piece], look = getComputedStyle(box);
   const had = keep && cine.roll ? cine.roll.i : 0;
-  if (!keep) { clearTimeout(cine.timer); cine.phase = 'title'; vo.stop(); }
+  if (!keep) { clearTimeout(cine.timer); cine.phase = 'title'; cine.shot = 0; box.classList.remove('settled'); $('cine-far').style.transition = ''; vo.stop(); }
   if (cine.roll) { writers.delete(cine.roll); writers.delete(cine.card); }
   cine.piece = st.piece; cine.w = box.clientWidth; cine.h = box.clientHeight;
   cine.tone = { ink: look.getPropertyValue('--cine-ink').trim(), soft: look.getPropertyValue('--cine-soft').trim() };
   for (const b of $('cine-label').children) b.hidden = b.dataset.piece !== st.piece;
   const room = view.clientHeight - CINE_BAND * 2, rows = cine.w > cine.h * 1.2 ? 6 : 8;
   const cell = Math.max(18, Math.floor(room / (rows + 1))), gap = Math.round(cell * 0.3);
-  // The whole scroll is one canvas: keep it inside what browsers, phones above all, will allocate.
-  const long = (Math.ceil([...piece.text].length / rows) + 4) * (cell + gap), sharp = DPR;
-  DPR = Math.max(0.75, Math.min(sharp, 15500 / long, Math.sqrt(16e6 / (long * (room + CINE_BAND * 2)))));
   cine.roll = new Writer($('cine-roll'), {
     text: piece.text, tail: piece.tail, pen: st.pen, cell, gap, rows, pad: Math.round(cell * 0.35), hang: Math.round(cell * 0.3), pre: had, color: cine.tone.ink, sealColor: css('--seal'),
-    rate: st.rate, minW: view.clientWidth, always: () => true, gate,
+    rate: st.rate, minW: view.clientWidth, view: view.clientWidth * 1.75, always: () => true, gate,
     onChar: (w, it, i) => { w.o.rate = pace(w, i); },
     onMove: w => { cineCaption(w); $('cine-bar').style.width = (100 * Math.min(w.i, w.main) / w.main).toFixed(2) + '%'; },
     onDone: () => { vo.stop(); cineLater(cineWide, REDUCED ? 300 : 1400); },
   });
-  DPR = sharp;
-  cine.roll.cv.style.top = (CINE_BAND + Math.max(0, (room - cine.roll.H) / 2)).toFixed(1) + 'px';
+  cine.roll.cv.style.top = $('cine-far').style.top = (CINE_BAND + Math.max(0, (room - cine.roll.H) / 2)).toFixed(1) + 'px';
   cine.roll.cv.setAttribute('aria-label', piece.label);
   cine.card = new Writer($('cine-title'), {
     text: piece.name, pen: st.pen, cell: Math.round(Math.min(cine.h * 0.15, cine.w * 0.2)), gap: 0, rows: [...piece.name].length, pad: 4, color: '#ece8da', speed: 2600, rate: 1.4,
@@ -920,19 +957,49 @@ function cineCamera(dt, snap) {
   const w = cine.roll, span = $('cine-view').clientWidth, it = w.items[Math.min(w.i, w.items.length - 1)];
   const want = Math.min(0, Math.max(span - w.W, span * 0.36 - (it.x + it.cell / 2)));
   cine.tx = snap || REDUCED ? want : cine.tx + (want - cine.tx) * (1 - Math.exp(-dt / 520));
-  w.cv.style.transform = `translate3d(${cine.tx.toFixed(1)}px,0,0)`;
+  w.see(Math.min(-cine.tx, it.x - it.cell), Math.max(span - cine.tx, it.x + it.cell * 2));     // the screen, and the pen
+  w.cv.style.transform = `translate3d(${(cine.tx + w.ox).toFixed(1)}px,0,0)`;
   const moon = $('cine').firstElementChild;         // the moon sets as the writing comes under it
   $('cine').classList.toggle('veil', it.x + cine.tx < moon.offsetLeft + moon.offsetWidth + it.cell * 0.4);
 }
 /* The closing shot: the whole scroll, end to end, across the middle of the screen. Where that
-   would leave the writing too small to be writing (a phone held upright), it stops short, at
-   the end that has the colophon and the seal, and the scroll runs on off the screen. */
+   would leave the writing too small to be writing (a long text, or a phone held upright), the
+   camera stops short, at the end that has the colophon and the seal, and then travels along the
+   scroll to where it began. cine.shot: 0 pulling back, 1 pulled back, 2 at the opening.
+   Returns how far there is to travel. */
 function cinePull() {
-  const w = cine.roll, view = $('cine-view'), span = view.clientWidth, top = parseFloat(w.cv.style.top) || 0;
+  const w = cine.roll, far = $('cine-far'), view = $('cine-view'), span = view.clientWidth, top = parseFloat(w.cv.style.top) || 0;
   const whole = Math.min(1, span * 0.94 / w.W), least = Math.min(1, 12 / w.o.cell), all = whole >= least * 0.75, s = all ? whole : least;
-  w.cv.style.transform = `translate3d(${(all ? (span - w.W * s) / 2 : span * 0.04).toFixed(1)}px,${(cine.h / 2 - view.offsetTop - w.H * s / 2 - top).toFixed(1)}px,0) scale(${s.toFixed(4)})`;
+  const from = all ? (span - w.W * s) / 2 : span * 0.04, to = all ? from : span * 0.96 - w.W * s;
+  const x = cine.shot === 2 ? to : from, y = cine.h / 2 - view.offsetTop - w.H * s / 2 - top;
+  // The whole scroll, drawn at the size it will be seen. While the camera pulls back, the canvas
+  // that was being written on keeps its own stretch, sharp; then this one has all of it.
+  const c = fit(far, w.W * s, w.H * s);
+  far.style.setProperty('--mount', (CINE_BAND * s).toFixed(2) + 'px');
+  if (!cine.shot) { c.beginPath(); c.rect(0, 0, w.ox * s, w.H * s); c.rect((w.ox + w.cw) * s, 0, (w.W - w.ox - w.cw) * s, w.H * s); c.clip(); }
+  w.o.bold = +(w.o.cell * s < 24); w.ink(c, 0, w.W, s); w.o.bold = 0;      // small writing wants the heavier pen
+  if (cine.phase === 'roll') {          // from where the camera is: this canvas enlarged to the scroll's own size
+    far.style.transform = `translate3d(${cine.tx.toFixed(1)}px,0,0) scale(${(1 / s).toFixed(4)})`; far.getBoundingClientRect();
+    cinePhase('wide');
+  }
+  far.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
+  w.cv.style.transform = `translate3d(${(x + w.ox * s).toFixed(1)}px,${y.toFixed(1)}px,0) scale(${s.toFixed(4)})`;
+  return from - to;
 }
-function cineWide() { cinePhase('wide'); $('cine').classList.remove('veil'); cinePull(); cineLater(() => cinePhase('end'), REDUCED ? 200 : 3800); }
+function cineWide() {
+  const box = $('cine'), far = $('cine-far'), wait = REDUCED ? 100 : 1900;
+  box.classList.remove('veil'); cine.shot = 0; cinePull();
+  cineLater(() => {                     // well on the way out: the small canvas takes over
+    cine.shot = 1; box.classList.add('settled'); const run = cinePull();
+    if (run < 1 || REDUCED) return cineLater(() => cinePhase('end'), wait);
+    cineLater(() => {                   // along the scroll, at a pace the eye can keep
+      const secs = Math.min(9, Math.max(2.5, run / ($('cine-view').clientWidth * 0.22)));
+      far.style.transition = `transform ${secs.toFixed(2)}s cubic-bezier(.45, 0, .55, 1)`; far.getBoundingClientRect();
+      cine.shot = 2; cinePull();
+      cineLater(() => { far.style.transition = ''; cinePhase('end'); }, secs * 1000 + 500);
+    }, wait + 700);
+  }, wait);
+}
 function cineWake() { cine.moved = performance.now(); $('cine').classList.remove('idle'); }
 function cineTick(dt) {
   if (!cine.on) return;
@@ -956,7 +1023,7 @@ function cineClose() {
   if (!cine.on) return;
   cine.on = false; clearTimeout(cine.timer); clearTimeout(cine.again); vo.stop();
   writers.delete(cine.roll); writers.delete(cine.card); ticks.delete(cineTick); cine.roll = cine.card = null;
-  fit($('cine-roll'), 1, 1);            // give the long canvas back
+  fit($('cine-roll'), 1, 1); fit($('cine-far'), 1, 1);          // give the canvases back
   st.read = cine.was.read; st.sound = cine.was.sound; music();
   $('cine').hidden = true; root.classList.remove('cine-on');
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -1023,7 +1090,7 @@ function wire() {
   $('again').addEventListener('click', () => { restart(0); if (st.read) vo.say(0); });
   $('finish').addEventListener('click', () => { st.asked = true; W.roll.finish(); $('scroll').scrollTo({ left: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
   $('more-btn').addEventListener('click', () => { const open = $('more').hidden; $('more').hidden = !open; $('more-btn').setAttribute('aria-expanded', open); });
-  seg(['piece-lanting', 'piece-chibi'], b => { st.piece = b.dataset.piece; st.picked = true; st.asked = true; playing(true); init(); if (st.read) vo.say(0); });
+  seg(PICK, b => { st.piece = b.dataset.piece; st.picked = true; st.asked = true; playing(true); init(); if (st.read) vo.say(0); });
   for (const id of ['theme-light', 'theme-dark']) $(id).addEventListener('click', () => {
     root.dataset.theme = $(id).dataset.set; try { localStorage.setItem('yisu-theme', root.dataset.theme); } catch (e) { /* the choice lasts this visit only */ }
     sync();

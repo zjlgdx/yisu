@@ -2,7 +2,7 @@
 
 The site for 一粟 (Yisu), three hand-drawn open-source Chinese fonts: 印泥 (the Typewriter), 畫沙 (the Ballpoint) and 漏痕 (the Marker). The fonts are built in [zjlgdx/pinboard-fonts](https://github.com/zjlgdx/pinboard-fonts), where their files still carry the name Pinboard.
 
-The page writes its texts a stroke at a time, in vertical columns from right to left: 王羲之's 蘭亭集序 by day (the theme 天雨粟) and the opening of 蘇軾's 前赤壁賦 by night (鬼夜哭). Nothing on it is a picture of type. The scroll is drawn on a canvas from the fonts' own centre lines with the fonts' own pens; everything else, the specimens and the box to type in included, is set in the fonts themselves. A recorded voice can read each sentence as it is written, and the writing keeps time with it. 觀影 opens the scroll alone on a dark screen, large, with the reading and the music on: a title, the text six characters to a column (eight on an upright screen) with the camera following the pen and the clause being written as a caption, then the whole scroll end to end.
+The page writes its texts a stroke at a time, in vertical columns from right to left: 王羲之's 蘭亭集序 by day (the theme 天雨粟) and the opening of 蘇軾's 前赤壁賦 by night (鬼夜哭); a reader can also pick 王勃's 滕王閣序, whole, with the poem that closes it. Nothing on it is a picture of type. The scroll is drawn on a canvas from the fonts' own centre lines with the fonts' own pens; everything else, the specimens and the box to type in included, is set in the fonts themselves. A recorded voice can read each sentence as it is written, and the writing keeps time with it. 觀影 opens the scroll alone on a dark screen, large, with the reading and the music on: a title, the text six characters to a column (eight on an upright screen) with the camera following the pen and the clause being written as a caption, then the whole scroll end to end. A scroll too long to take in at once (滕王閣序, or any of them on an upright phone) is pulled back only as far as it still reads as writing, and the camera then travels along it to where it began.
 
 ## The name
 
@@ -21,9 +21,8 @@ The page writes its texts a stroke at a time, in vertical columns from right to 
 | `public/audio/day.mp3`, `night.mp3` | The music for each theme. Generated. |
 | `public/og.png` | The picture a link to the site shows. Generated. |
 | `public/favicon.svg`, `favicon.png`, `apple-touch-icon.png` | The mark: one stroke with a grain above it (滄海一粟), and its form for browser tabs, on a light tile so the stroke shows on dark tab bars. Generated, as is the mark in the page's navigation. |
-| `public/_headers` | Cache rules for the files above. |
+| `public/_headers` | Cache rules: a day for fonts and sound; the files the page starts from are asked for again each visit. |
 | `tools/` | The scripts that generate those files. |
-| `tools/extra.py` | Five characters the two texts need that the fonts don't draw yet, put together from parts the fonts already have. |
 | `wrangler.jsonc` | The Cloudflare Workers configuration. |
 
 ## Regenerating the data
@@ -38,7 +37,7 @@ $FONTS/.venv/bin/python tools/mark.py $FONTS
 $FONTS/.venv/bin/python tools/og.py $FONTS
 ```
 
-Run them again after the page's text changes, and after each release of the fonts. In `index.html`, `class="spec"` marks text set in all three families, and `class="far"` marks the two long texts.
+Run them again after the page's text changes, and after each release of the fonts. In `index.html`, `class="spec"` marks text set in all three families, and `class="far"` marks the long texts under 讀全文.
 
 The sound is made apart from the fonts:
 
@@ -48,7 +47,7 @@ python3 -I tools/hear.py Unihan_Readings.txt
 $FONTS/.venv/bin/python tools/music.py
 ```
 
-`tools/audio.py` asks MiniMax's speech synthesis for one clip per sentence (run it again when a text changes; the page paces its writing by the clips' lengths). `tools/hear.py UNIHAN_READINGS` then checks the reading without anyone listening: whisper-cli writes down what each clip says, and that is set against the text sound by sound (Unihan's Mandarin readings, tones aside). A clip it marks LISTEN gets another take (`TAKES` in `tools/audio.py`) or a person's ear. `tools/music.py` needs only numpy and ffmpeg: it works out each plucked note itself, so nothing in the music is recorded or sampled.
+`tools/audio.py` asks MiniMax's speech synthesis for one clip per sentence (run it again when a text changes; the page paces its writing by the clips' lengths). To add a text, give it a `<p id="text-NAME" class="far">` under 讀全文, an entry in `PIECES` and a button in the page, and its name in `PIECES` in `tools/audio.py` and the list in `tools/hear.py`; then run everything on this page again. `tools/hear.py UNIHAN_READINGS` then checks the reading without anyone listening: whisper-cli writes down what each clip says, and that is set against the text sound by sound (Unihan's Mandarin readings, tones aside). A clip it marks LISTEN gets another take (`TAKES` in `tools/audio.py`), a reading pinned for that clip (`PINS`), or a person's ear. `tools/music.py` needs only numpy and ffmpeg: it works out each plucked note itself, so nothing in the music is recorded or sampled.
 
 ## Looking at it
 

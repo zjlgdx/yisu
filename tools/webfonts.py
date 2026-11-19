@@ -5,7 +5,7 @@
 FONTS is a checkout of https://github.com/zjlgdx/pinboard-fonts. This writes
 
     public/fonts/<family>-<weight>.woff2   what index.html itself shows in that font
-    public/fonts/huasha-400-t.woff2        the rest of the two texts under 讀全文
+    public/fonts/huasha-400-t.woff2        the rest of the texts under 讀全文
     public/fonts/faces.css                 the @font-face rules for those
 
 and, with `full`, the whole of every font for the tester, in slices a browser fetches
@@ -16,8 +16,9 @@ only when a reader types a character from one (not committed: about 45 MB):
     public/fonts/full/index.json                   what the page makes their @font-face rules from
 
 In index.html, class="spec" marks text set in all three families, data-spec="..." names
-more characters for them, and class="far" marks the two long texts.
+more characters for them, and class="far" marks the long texts.
 """
+import hashlib
 import json
 import re
 import sys
@@ -109,7 +110,7 @@ def main():
     html = (PUB / 'index.html').read_text(encoding='utf-8')
     far = marked(html, 'far')
     spec = set(map(ord, ALWAYS + marked(html, 'spec')))
-    # Everything the file says outside the two long texts is the running text, in 畫沙.
+    # Everything the file says outside the long texts is the running text, in 畫沙.
     page = spec | set(map(ord, re.sub(r'<p[^>]*class="far"[^>]*>.*?</p>', '', html, flags=re.S)))
     texts = set(map(ord, far)) - page
     order = []
@@ -146,11 +147,14 @@ def main():
                 jobs.append((src, other, str(PUB / 'fonts' / 'full' / f'{name}-a.woff2')))
                 index.append({'family': family, 'weight': weight, 'file': name,
                               'skip': ''.join(chr(c) for c in sorted(skip) if han(c)), 'other': ranges(other)})
-    # The texts' own face comes first: a browser tries the last rule first, and that is the page's.
-    (PUB / 'fonts' / 'faces.css').write_text(
-        '/* Made by tools/webfonts.py. */\n' + '\n'.join(faces) + '\n', encoding='utf-8')
     with ProcessPoolExecutor(6) as pool:
         sizes = dict(pool.map(cut, jobs, chunksize=1))
+    # The texts' own face comes first: a browser tries the last rule first, and that is the page's.
+    # Each file is named with a mark of what is in it, so a browser that kept yesterday's cut
+    # fetches today's.
+    mark = lambda m: f'url({m[1]}?v={hashlib.sha1((PUB / "fonts" / m[1]).read_bytes()).hexdigest()[:8]})'
+    (PUB / 'fonts' / 'faces.css').write_text(
+        '/* Made by tools/webfonts.py. */\n' + re.sub(r'url\(([\w-]+\.woff2)\)', mark, '\n'.join(faces)) + '\n', encoding='utf-8')
     for k, v in sizes.items():
         if not k.startswith('full/'):
             print(f'{k}: {v // 1024} KB')

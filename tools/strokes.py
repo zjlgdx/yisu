@@ -17,8 +17,6 @@ SITE = Path(__file__).resolve().parent.parent
 PUB = SITE / 'public'
 FONTS = Path(sys.argv[1]).resolve()
 sys.path[:0] = [str(FONTS), str(FONTS / 'tools')]
-import _repo
-_repo.load(str(SITE / 'tools' / 'extra.py'))
 import build
 import hanzi
 

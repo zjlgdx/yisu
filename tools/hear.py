@@ -95,8 +95,8 @@ def main():
 
     html = (SITE / 'public' / 'index.html').read_text(encoding='utf-8')
     only, doubt, total = set(sys.argv[2:]), [], 0
-    for piece in ('lanting', 'chibi'):
-        text = re.sub(r'\s+', '', re.search(rf'<p id="text-{piece}"[^>]*>(.*?)</p>', html, re.S).group(1))
+    for piece in ('lanting', 'chibi', 'tengwang'):
+        text = re.sub(r'<[^>]+>|\s+', '', re.search(rf'<p id="text-{piece}"[^>]*>(.*?)</p>', html, re.S).group(1))
         sents = [s for s in re.split(rf'(?<=[{ENDS}])', text) if s]
         for k, sent in enumerate(sents):
             name = f'{piece}-{k:02d}'

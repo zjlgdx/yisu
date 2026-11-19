@@ -1,10 +1,10 @@
-# Fonts, stroke data and sound change only when the fonts or the texts do: a day in the
-# cache, and a week more while a newer copy is fetched behind.
-/fonts/*
+# The page's own first files (index.html, strokes.js, fonts/faces.css, audio/vo.json) are asked
+# for again on every visit, so a new text or a new cut of the fonts shows at once. What they
+# point to changes only when the fonts or the texts do: a day in the cache, and a week more
+# while a newer copy is fetched behind. faces.css names each font with a mark of its contents.
+/fonts/*.woff2
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-/audio/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
-/strokes*.js
+/audio/*.mp3
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /og.png
   Cache-Control: public, max-age=86400
