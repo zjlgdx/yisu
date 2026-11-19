@@ -26,6 +26,7 @@
 :root {
   --mode: light; color-scheme: light;
   --paper: #efeee9; --fibre: #e3e1d9; --panel: #f6f5f1; --ink: #1d1c1b; --soft: #5e5b55; --seal: #b3362b; --accent: #b3362b; --line: #cfccc2;
+  --cine-stage: #171615; --cine-paper: #f6f5f1; --cine-ink: #1d1c1b; --cine-band: #56707c; --cine-soft: #a39f94; --cine-moon: transparent; --cine-glow: transparent;
   --band: #56707c; --band-w: 14px; --grain: #b08020; --on-bg: #1d1c1b; --on-fg: #efeee9;
   --night-block: none; --night-flex: none; --glow: none;
   --paper-image: radial-gradient(var(--fibre) .6px, transparent .7px), radial-gradient(var(--fibre) .5px, transparent .6px);
@@ -33,8 +34,8 @@
   --text: "Yisu Huasha", "Songti TC", "Noto Serif TC", "PMingLiU", serif;
   --pen-font: "Yisu Huasha";
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
-:root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
+:root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
 html, body { height: auto; }
 body { margin: 0; background-color: var(--paper); background-image: var(--paper-image); background-size: var(--paper-size); background-position: 0 0, 3px 5px;
   color: var(--ink); font-family: var(--text); font-size: 18px; line-height: 1.7; }
@@ -164,6 +165,45 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   .try { font-size: 34px; padding: 12px 14px; }
 }
 @media (max-width: 520px) { .theme span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .theme svg { margin-right: 0 !important; } }
+/* The viewing mode: the scroll alone on a dark table (by night, on the sky itself), large, the
+   camera following the pen. The script sizes what is in it, since it knows the screen. */
+.cine-on { overflow: hidden; }
+.cine { position: fixed; inset: 0; z-index: 20; overflow: hidden; background: var(--cine-stage); color: #ece8da; --on-bg: #ece8da; --on-fg: #171615; outline: 0; }
+.cine[hidden], .cine-end[hidden], .cine-label [hidden] { display: none; }
+.cine-moon { position: absolute; left: 6%; top: 15%; width: 9%; aspect-ratio: 1; border-radius: 50%; background: var(--cine-moon); box-shadow: 0 0 46px var(--cine-glow); opacity: .92; transition: opacity 1.4s; }
+.cine.veil .cine-moon { opacity: .08; }
+.cine-label { position: absolute; left: max(3%, env(safe-area-inset-left, 0px)); top: calc(3.4% + env(safe-area-inset-top, 0px)); font-size: 14px; line-height: 1; letter-spacing: .32em; color: var(--cine-soft); transition: opacity .8s; }
+.cine-label i { font-style: normal; margin-left: 1.2em; }
+.cine-view { position: absolute; left: 0; right: 0; top: 10%; height: 71%; overflow: hidden; transition: opacity 1s; }
+#cine-roll { position: absolute; left: 0; top: 8px; display: block; background: var(--cine-paper); box-shadow: 0 -8px 0 var(--cine-band), 0 8px 0 var(--cine-band); transform-origin: 0 0; will-change: transform; }
+.cine-card { position: absolute; inset: 0; display: flex; flex-direction: row-reverse; align-items: center; justify-content: center; gap: 2.4%; transition: opacity .8s; }
+.cine-card canvas, .cine-caption canvas { display: block; }
+#cine-by { align-self: flex-end; }
+.cine-caption { position: absolute; left: 0; right: 0; bottom: 3.5%; height: 13%; display: flex; align-items: center; justify-content: center; transition: opacity .6s; }
+.cine-end { position: absolute; inset: 0; align-items: flex-end; justify-content: center; padding-bottom: 7vh; }
+.cine-ctl { position: absolute; right: max(2.4%, env(safe-area-inset-right, 0px)); top: calc(2.2% + env(safe-area-inset-top, 0px)); max-width: 92%; justify-content: flex-end; font-size: 14px; transition: opacity .4s; }
+.cine.idle .cine-ctl:not(:focus-within) { opacity: 0; }
+.cine.idle { cursor: none; }
+.cine-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 232, 218, .3); }
+.cine-bar i { position: absolute; right: 0; top: 0; height: 100%; width: 0; background: var(--accent); }
+.cine[data-phase="title"] .cine-view, .cine[data-phase="title"] .cine-label, .cine[data-phase="title"] .cine-caption { opacity: 0; }
+.cine:not([data-phase="title"]) .cine-card { opacity: 0; }
+.cine[data-phase="wide"] .cine-caption, .cine[data-phase="end"] .cine-caption, .cine.nocap .cine-caption { opacity: 0; }
+.cine[data-phase="wide"] #cine-roll, .cine[data-phase="end"] #cine-roll { transition: transform 3.4s cubic-bezier(.4, 0, .2, 1); }
+/* A narrow screen: the buttons take two rows, so the band above the scroll is taller, and the
+   name shows when the buttons have gone. A short one (a phone on its side): smaller buttons. */
+@media (max-width: 620px) {
+  .cine-view { top: 15%; height: 66%; }
+  .cine-ctl { font-size: 13px; gap: 6px 8px; }
+  .cine-ctl button { padding: 4px 10px; min-height: 36px; }
+  .cine:not(.idle) .cine-label { opacity: 0; }
+}
+@media (max-height: 500px) {
+  .cine-ctl { font-size: 13px; top: calc(1% + env(safe-area-inset-top, 0px)); }
+  .cine-ctl button { padding: 2px 10px; min-height: 30px; }
+  .cine-label { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .cine * { transition: none !important; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
@@ -201,6 +241,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
           </span>
           <button id="read" aria-pressed="false">朗讀</button>
           <button id="sound" aria-pressed="false">配樂</button>
+          <button id="cine-open" title="全螢幕看這一卷，有朗讀和配樂"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V3h3M11 3h3v3M14 10v3h-3M5 13H2v-3"/></svg>觀影</button>
           <button id="more-btn" aria-expanded="false" aria-controls="more">更多</button>
         </div>
         <span class="note"><span id="progress"></span><span id="note"></span></span>
@@ -332,6 +373,25 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   <footer>這一頁的字，連同你正在讀的這一行，都是一粟自己寫的。朗讀由 MiniMax 語音合成。<a href="https://github.com/zjlgdx/yisu" target="_blank" rel="noopener">網站原始碼</a></footer>
 </div>
 
+<div class="cine" id="cine" hidden data-phase="title" tabindex="-1" role="dialog" aria-modal="true" aria-label="觀影">
+  <div class="cine-moon" aria-hidden="true"></div>
+  <div class="cine-label" id="cine-label" aria-hidden="true"><b data-piece="lanting">蘭亭集序<i>王羲之</i></b><b data-piece="chibi">前赤壁賦<i>蘇軾</i></b></div>
+  <div class="cine-view" id="cine-view"><canvas id="cine-roll" role="img"></canvas></div>
+  <div class="cine-card" aria-hidden="true"><canvas id="cine-title"></canvas><canvas id="cine-by"></canvas></div>
+  <div class="cine-caption" aria-hidden="true"><canvas id="cine-sub"></canvas></div>
+  <div class="cine-end ctl" id="cine-end" hidden><button id="cine-again">再看一遍</button></div>
+  <div class="cine-ctl ctl">
+    <button id="cine-play" aria-pressed="true">暫停</button>
+    <span class="seg" role="group" aria-label="筆">
+      <button id="cine-clay" data-pen="clay" aria-pressed="false">印泥</button><button id="cine-sand" data-pen="sand" aria-pressed="true">畫沙</button><button id="cine-rain" data-pen="rain" aria-pressed="false">漏痕</button>
+    </span>
+    <button id="cine-read" aria-pressed="true">朗讀</button>
+    <button id="cine-sound" aria-pressed="true">配樂</button>
+    <button id="cine-cap" aria-pressed="true">字幕</button>
+    <button id="cine-close">離開</button>
+  </div>
+  <div class="cine-bar" aria-hidden="true"><i id="cine-bar"></i></div>
+</div>
 <script src="strokes.js"></script>
 <script>
 (() => {
@@ -339,7 +399,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 const S = window.YISU_STROKES || {};
 // The logo's 點: one stroke, a grain of millet and the first stroke of 永.
 S[''] = [['D', [380, 230, 450, 300, 520, 390, 575, 500, 600, 640, 590, 740]]];
-const DPR = Math.min(2, window.devicePixelRatio || 1);
+let DPR = Math.min(2, window.devicePixelRatio || 1);     // the viewing mode lowers it for its one long canvas
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- the three pens, from the fonts' own cuts ---------- */
@@ -467,6 +527,7 @@ function inkAll(root) {
 /* ---------- the writer: a text in columns, right to left, a stroke at a time ---------- */
 const VERT = { '「': '﹁', '」': '﹂' };          // a column's own quotation marks
 const PUNCT = '，。、；：？！﹁﹂';
+const CLOSING = '，。、；：？！﹂', SMALL = '，。、；：';     // marks that should not open a column; the ones small enough to hang
 const ENDS = '。！？；';
 class Writer {
   constructor(cv, o) {
@@ -474,16 +535,33 @@ class Writer {
     this.on = false; this.build(); this.reset(this.o.pre);
   }
   build() {
-    const o = this.o, chars = [...o.text].map(c => VERT[c] || c); this.cols = Math.ceil(chars.length / o.rows); this.main = chars.length;
-    let extra = 0; if (o.tail) extra = Math.ceil(o.tail.length / Math.floor(o.rows * o.cell / (o.cell * 0.6))) * o.cell * 0.6 + o.cell * 1.3 + o.gap * 2;
-    this.W = Math.max(o.minW || 0, this.cols * (o.cell + o.gap) - o.gap + o.pad * 2 + extra); this.H = o.rows * o.cell + o.pad * 2;
+    const o = this.o, chars = [...o.text].map(c => VERT[c] || c), at = []; this.main = chars.length;
+    // A grid, top to bottom and right to left. With o.hang (the room for it, in px) no closing
+    // mark opens a column, as on a set page: a small one hangs under the foot of the column
+    // before, a tall one takes the character before it along.
+    let col = 0, row = 0;
+    chars.forEach((ch, i) => {
+      const prev = at[i - 1];
+      if (o.hang && row === 0 && prev && prev[1] === o.rows - 1 && CLOSING.includes(ch)) {
+        if (SMALL.includes(ch)) { at.push([col - 1, o.rows]); return; }
+        if (!PUNCT.includes(chars[i - 1])) { prev[0] = col; prev[1] = 0; row = 1; }
+      }
+      at.push([col, row]); if (++row === o.rows) { row = 0; col++; }
+    });
+    this.cols = col + (row ? 1 : 0);
+    // 落款: smaller, in one column where it fits; where it does not, each part in a column of its own.
+    const c = Math.round(o.cell * 0.6), per = Math.floor(o.rows * o.cell / c), lines = [];
+    if (o.tail) { const parts = [].concat(o.tail), all = parts.join(''); for (const part of all.length <= per ? [all] : parts) for (let q = 0; q < part.length; q += per) lines.push(part.slice(q, q + per)); }
+    const pitch = c * 1.3, extra = lines.length ? o.cell * 0.6 + (lines.length - 1) * pitch + o.cell * 1.3 + o.gap * 2 : 0;
+    this.W = Math.max(o.minW || 0, this.cols * (o.cell + o.gap) - o.gap + o.pad * 2 + extra); this.H = o.rows * o.cell + o.pad * 2 + (o.hang || 0);
     this.ctx = fit(this.cv, this.W, this.H);
-    this.items = chars.map((ch, i) => { const col = Math.floor(i / o.rows), row = i % o.rows; return { ch, cell: o.cell, row, x: this.W - o.pad - (col + 1) * o.cell - col * o.gap, y: o.pad + row * o.cell }; });
-    if (o.tail) {                       // 落款: smaller, one column on, then the seal
-      const c = Math.round(o.cell * 0.6), per = Math.floor(o.rows * o.cell / c), x0 = this.W - o.pad - this.cols * (o.cell + o.gap) - o.gap - c;
-      [...o.tail].forEach((ch, i) => this.items.push({ ch, cell: c, row: i % per, x: x0 - Math.floor(i / per) * c, y: o.pad + o.cell * 0.4 + (i % per) * c, tail: true }));
-      const last = this.items[this.items.length - 1];
-      this.items.push({ seal: true, cell: Math.round(o.cell * 1.1), x: last.x - (o.cell * 1.1 - c) / 2, y: Math.min(last.y + c * 1.5, this.H - o.pad - o.cell * 2.3), row: 1 });
+    this.items = chars.map((ch, i) => { const [col, row] = at[i]; return { ch, cell: o.cell, row, x: this.W - o.pad - (col + 1) * o.cell - col * o.gap, y: o.pad + row * o.cell - (row === o.rows ? o.cell * 0.18 : 0) }; });   // a hung mark tucks in
+    if (lines.length) {                 // one column on from the text, then the seal: under the last column, or beside it
+      const x0 = this.W - o.pad - this.cols * (o.cell + o.gap) - o.gap - c;
+      lines.forEach((line, k) => [...line].forEach((ch, r) => this.items.push({ ch, cell: c, row: r, x: x0 - k * pitch, y: o.pad + o.cell * 0.4 + r * c, tail: true })));
+      const last = this.items[this.items.length - 1], s = o.cell * 1.1, foot = this.H - (o.hang || 0) - o.pad - o.cell * 2.3;
+      const under = lines.length === 1 || last.y + c * 1.5 <= foot;
+      this.items.push({ seal: true, cell: Math.round(s), x: under ? last.x - (s - c) / 2 : last.x - s - c * 0.4, y: under ? Math.min(last.y + c * 1.5, foot) : foot, row: 1 });
     }
   }
   reset(n = 0) {
@@ -577,8 +655,8 @@ const FONT = { clay: 'Yisu Yinni', sand: 'Yisu Huasha', rain: 'Yisu Louhen' };
 const text = id => $(id).textContent.replace(/\s+/g, '');
 const YEAR = ganzhi();
 const PIECES = {
-  lanting: { text: text('text-lanting'), tail: '王羲之蘭亭集序歲在' + YEAR + '一粟書', label: '一筆一劃寫出的《蘭亭集序》', note: '王羲之《蘭亭集序》' },
-  chibi: { text: text('text-chibi'), tail: '蘇軾前赤壁賦歲在' + YEAR + '一粟書', label: '一筆一劃寫出的《前赤壁賦》', note: '蘇軾《前赤壁賦》開頭' },
+  lanting: { text: text('text-lanting'), tail: ['王羲之蘭亭集序', '歲在' + YEAR + '一粟書'], label: '一筆一劃寫出的《蘭亭集序》', note: '王羲之《蘭亭集序》', name: '蘭亭集序', by: '王羲之' },
+  chibi: { text: text('text-chibi'), tail: ['蘇軾前赤壁賦', '歲在' + YEAR + '一粟書'], label: '一筆一劃寫出的《前赤壁賦》', note: '蘇軾《前赤壁賦》開頭', name: '前赤壁賦', by: '蘇軾' },
 };
 const LIB = [...$('cells').dataset.spec];
 const st = { mode: '', piece: 'lanting', picked: false, pen: 'sand', char: '永', sound: false, read: false, rate: 1.5, playing: true, asked: false, touched: 0, width: 0 };
@@ -606,6 +684,11 @@ vo.say = k => {
   const p = vo.el.play(); if (p) p.catch(() => { vo.live = false; });
 };
 vo.stop = () => { vo.el.pause(); vo.live = false; vo.k = -1; vo.until = 0; };
+vo.prime = () => {                      // inside a click, so that clips may start later without one
+  vo.el.muted = true; vo.el.src = `audio/vo/${st.piece}-00.mp3`;
+  const done = () => { if (!vo.live) vo.el.pause(); vo.el.muted = false; }, p = vo.el.play();
+  if (p) p.then(done, done); else done();
+};
 vo.hold = on => {                       // with the writing, when it pauses and goes on
   if (!vo.live) return;
   if (on) vo.el.pause(); else { vo.deadline = performance.now() + (vo.dur - vo.el.currentTime) * 1000 + 5000; const p = vo.el.play(); if (p) p.catch(() => { vo.live = false; }); }
@@ -637,6 +720,15 @@ function progress(w) {
   $('progress').textContent = w.done ? '寫完了。' : `第 ${n} 字，共 ${w.main} 字。`;
 }
 
+/* With the reading on, a sentence waits for the one before it to be read out. */
+function gate(w, it, i) {
+  if (!st.read || i >= w.main) return true;
+  const k = W.sent.of[i];
+  if (W.sent.starts[k] !== i || vo.k === k) return true;
+  if (vo.busy()) return false;
+  vo.say(k); return true;
+}
+
 function init(keep) {
   const dark = st.mode === 'dark', ink = css('--ink'), piece = PIECES[st.piece], scroller = $('scroll');
   const had = W.roll && keep ? W.roll.i : null, quoted = W.quote && W.quote.begun;
@@ -649,13 +741,7 @@ function init(keep) {
   W.roll = new Writer($('roll'), {
     text: piece.text, tail: piece.tail, pen: st.pen, cell, gap: Math.round(cell * 0.3), rows: 10, pad: Math.round(cell * 0.5), pre: had === null ? (st.read ? 0 : 20) : had,
     color: ink, sealColor: css('--seal'), rate: st.rate, minW: scroller.clientWidth, always: () => st.read,
-    gate: (w, it, i) => {               // a sentence waits for the one before it to be read out
-      if (!st.read || i >= w.main) return true;
-      const k = W.sent.of[i];
-      if (W.sent.starts[k] !== i || vo.k === k) return true;
-      if (vo.busy()) return false;
-      vo.say(k); return true;
-    },
+    gate,
     onStroke: (kind, it, si, n, stroke) => {
       const r = $('roll').getBoundingClientRect(), x = r.left + it.x + stroke.pts[0], y = r.top + it.y + stroke.pts[1];
       if (x > 0 && x < rain.w && y > 0 && y < rain.h) rain.sparks.push({ x, y, life: 1 });
@@ -669,7 +755,7 @@ function init(keep) {
   });
   W.sent = sentences(W.roll); W.roll.shown = scroller.shown;
   $('note').textContent = piece.note + (W.roll.W > scroller.clientWidth + 4 ? '，卷可以左右拖動。' : '。');
-  if (REDUCED && !st.asked) W.roll.reset(W.roll.items.length); else W.roll.on = st.playing;
+  if (REDUCED && !st.asked) W.roll.reset(W.roll.items.length); else W.roll.on = st.playing && !cine.on;
   progress(W.roll); writers.add(W.roll);
   if (had === null) scroller.scrollLeft = scroller.scrollWidth;
   else { const it = W.roll.items[Math.min(had, W.roll.items.length - 1)]; scroller.scrollLeft = Math.max(0, it.x - scroller.clientWidth * 0.3); }
@@ -701,6 +787,7 @@ function init(keep) {
   rain.color = css('--grain'); rain.alpha = dark ? 1 : 0.75; rain.sparks = [];
   rain.grains = Array.from({ length: Math.round(rain.w / (dark ? 16 : 56)) }, () => ({ x: r() * rain.w, y: r() * rain.h, v: 30 + r() * 70, a: r() * 6.28, s: (dark ? 1.2 : 2) + r() * 1.8, o: 0.15 + r() * 0.5 }));
   tick(0); if (!REDUCED) ticks.add(tick);
+  if (cine.on) cineLayout(st.piece === cine.piece);
 }
 function showChar(ch) {
   st.char = ch; for (const o of $('cells').children) o.setAttribute('aria-pressed', o.textContent === ch);
@@ -755,6 +842,166 @@ function sync(force) {
 }
 function playing(on) { st.playing = on; $('play').setAttribute('aria-pressed', on); $('play').textContent = on ? '暫停' : (W.roll && W.roll.done ? '再寫一遍' : '繼續'); }
 function restart(n) { const sc = $('scroll'); vo.stop(); st.asked = true; playing(true); W.roll.reset(n); W.roll.o.rate = st.rate; W.roll.on = true; if (!n) sc.scrollLeft = sc.scrollWidth; }
+/* ---------- the viewing mode: the scroll alone, large, the camera following the pen ----------
+   A title written in the middle of the screen; then the text, six to a column (eight on an
+   upright screen), with the sentence being written as a caption; then the whole scroll, end to
+   end. It reads aloud and plays the music unless the reader turns them off there. */
+const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null };
+const CINE_BAND = 8;                    // the mount above and below the paper, as the styles draw it
+const cineLater = (fn, ms) => { clearTimeout(cine.timer); cine.timer = setTimeout(fn, ms); };
+function cinePhase(p) {                 // title, roll, wide (pulling back), end
+  cine.phase = p; $('cine').dataset.phase = p; $('cine-end').hidden = p !== 'end';
+  if (cine.roll) cine.roll.on = p === 'roll' && cine.playing;
+  if (cine.card) cine.card.on = p === 'title' && cine.playing;
+}
+/* The runs of characters between punctuation, and which run each character is in. */
+function cineRuns(w) {
+  const runs = [], at = []; let a = -1;
+  for (let i = 0; i < w.main; i++) {
+    const mark = PUNCT.includes(w.items[i].ch);
+    if (!mark && a < 0) a = i;
+    if (mark && a >= 0) { runs.push([a, i]); a = -1; }
+    at.push(a >= 0 ? runs.length : Math.max(0, runs.length - 1));
+  }
+  if (a >= 0) runs.push([a, w.main]);
+  return { runs, at };
+}
+/* The caption: the run being written, in the Typewriter's hand; what is written is bright. */
+function cineCaption(w) {
+  const cv = $('cine-sub');
+  if (w.i >= w.main) { fit(cv, 1, 1); return; }
+  const c = w.clauses || (w.clauses = cineRuns(w)), run = c.runs[c.at[w.i]], n = run[1] - run[0];
+  const size = Math.max(14, Math.min(Math.round(cine.h * 0.056), Math.floor(cine.w * 0.9 / n)));
+  const ctx = fit(cv, n * size, size); ctx.fillStyle = '#ece8da';
+  for (let i = run[0]; i < run[1]; i++) { ctx.globalAlpha = i < w.i ? 1 : 0.3; glyph(ctx, w.items[i].ch, 'clay', 0, (i - run[0]) * size, 0, size); }
+}
+function cineByline() {
+  const by = [...PIECES[st.piece].by], c = Math.round(cine.card.o.cell * 0.4), ctx = fit($('cine-by'), c, c * by.length);
+  $('cine-by').style.marginBottom = Math.round(cine.h * 0.2) + 'px';
+  ctx.fillStyle = cine.tone.soft; by.forEach((ch, i) => glyph(ctx, ch, st.pen, 0, 0, i * c, c));
+}
+/* Size everything to the screen. keep: stay where the writing has got to. */
+function cineLayout(keep) {
+  const box = $('cine'), view = $('cine-view'), piece = PIECES[st.piece], look = getComputedStyle(box);
+  const had = keep && cine.roll ? cine.roll.i : 0;
+  if (!keep) { clearTimeout(cine.timer); cine.phase = 'title'; vo.stop(); }
+  if (cine.roll) { writers.delete(cine.roll); writers.delete(cine.card); }
+  cine.piece = st.piece; cine.w = box.clientWidth; cine.h = box.clientHeight;
+  cine.tone = { ink: look.getPropertyValue('--cine-ink').trim(), soft: look.getPropertyValue('--cine-soft').trim() };
+  for (const b of $('cine-label').children) b.hidden = b.dataset.piece !== st.piece;
+  const room = view.clientHeight - CINE_BAND * 2, rows = cine.w > cine.h * 1.2 ? 6 : 8;
+  const cell = Math.max(18, Math.floor(room / (rows + 1))), gap = Math.round(cell * 0.3);
+  // The whole scroll is one canvas: keep it inside what browsers, phones above all, will allocate.
+  const long = (Math.ceil([...piece.text].length / rows) + 4) * (cell + gap), sharp = DPR;
+  DPR = Math.max(0.75, Math.min(sharp, 15500 / long, Math.sqrt(16e6 / (long * (room + CINE_BAND * 2)))));
+  cine.roll = new Writer($('cine-roll'), {
+    text: piece.text, tail: piece.tail, pen: st.pen, cell, gap, rows, pad: Math.round(cell * 0.35), hang: Math.round(cell * 0.3), pre: had, color: cine.tone.ink, sealColor: css('--seal'),
+    rate: st.rate, minW: view.clientWidth, always: () => true, gate,
+    onChar: (w, it, i) => { w.o.rate = pace(w, i); },
+    onMove: w => { cineCaption(w); $('cine-bar').style.width = (100 * Math.min(w.i, w.main) / w.main).toFixed(2) + '%'; },
+    onDone: () => { vo.stop(); cineLater(cineWide, REDUCED ? 300 : 1400); },
+  });
+  DPR = sharp;
+  cine.roll.cv.style.top = (CINE_BAND + Math.max(0, (room - cine.roll.H) / 2)).toFixed(1) + 'px';
+  cine.roll.cv.setAttribute('aria-label', piece.label);
+  cine.card = new Writer($('cine-title'), {
+    text: piece.name, pen: st.pen, cell: Math.round(Math.min(cine.h * 0.15, cine.w * 0.2)), gap: 0, rows: [...piece.name].length, pad: 4, color: '#ece8da', speed: 2600, rate: 1.4,
+    always: () => true, pre: cine.phase === 'title' ? 0 : 99, onDone: () => { if (cine.phase === 'title') cineLater(() => cinePhase('roll'), REDUCED ? 400 : 1100); },
+  });
+  cineByline();
+  writers.add(cine.roll); writers.add(cine.card); ticks.add(cineTick);
+  cinePhase(cine.phase);
+  if (cine.phase === 'title' && REDUCED) cine.card.finish();
+  if (cine.phase === 'wide' || cine.phase === 'end') cinePull(); else cineCamera(0, true);
+}
+/* The camera keeps the column being written a third of the way in from the left. */
+function cineCamera(dt, snap) {
+  if (cine.phase === 'wide' || cine.phase === 'end') return;
+  const w = cine.roll, span = $('cine-view').clientWidth, it = w.items[Math.min(w.i, w.items.length - 1)];
+  const want = Math.min(0, Math.max(span - w.W, span * 0.36 - (it.x + it.cell / 2)));
+  cine.tx = snap || REDUCED ? want : cine.tx + (want - cine.tx) * (1 - Math.exp(-dt / 520));
+  w.cv.style.transform = `translate3d(${cine.tx.toFixed(1)}px,0,0)`;
+  const moon = $('cine').firstElementChild;         // the moon sets as the writing comes under it
+  $('cine').classList.toggle('veil', it.x + cine.tx < moon.offsetLeft + moon.offsetWidth + it.cell * 0.4);
+}
+/* The closing shot: the whole scroll, end to end, across the middle of the screen. Where that
+   would leave the writing too small to be writing (a phone held upright), it stops short, at
+   the end that has the colophon and the seal, and the scroll runs on off the screen. */
+function cinePull() {
+  const w = cine.roll, view = $('cine-view'), span = view.clientWidth, top = parseFloat(w.cv.style.top) || 0;
+  const whole = Math.min(1, span * 0.94 / w.W), least = Math.min(1, 12 / w.o.cell), all = whole >= least * 0.75, s = all ? whole : least;
+  w.cv.style.transform = `translate3d(${(all ? (span - w.W * s) / 2 : span * 0.04).toFixed(1)}px,${(cine.h / 2 - view.offsetTop - w.H * s / 2 - top).toFixed(1)}px,0) scale(${s.toFixed(4)})`;
+}
+function cineWide() { cinePhase('wide'); $('cine').classList.remove('veil'); cinePull(); cineLater(() => cinePhase('end'), REDUCED ? 200 : 3800); }
+function cineWake() { cine.moved = performance.now(); $('cine').classList.remove('idle'); }
+function cineTick(dt) {
+  if (!cine.on) return;
+  cineCamera(dt);
+  if (cine.phase === 'roll' && cine.playing && performance.now() - cine.moved > 2500) $('cine').classList.add('idle');
+}
+function cinePlay(on) { cine.playing = on; $('cine-play').setAttribute('aria-pressed', on); $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
+function cineOpen() {
+  if (cine.on) return;
+  const box = $('cine');
+  cine.was = { read: st.read, sound: st.sound }; cine.on = true; cine.full = false;
+  W.roll.on = false; vo.stop();
+  st.read = true; st.sound = true; vo.prime(); music();
+  for (const id of ['cine-read', 'cine-sound']) $(id).setAttribute('aria-pressed', true);
+  press(['cine-clay', 'cine-sand', 'cine-rain'], 'cine-' + st.pen);
+  box.hidden = false; root.classList.add('cine-on');
+  if (box.requestFullscreen) box.requestFullscreen().catch(() => { /* it fills the window instead */ });
+  cineLayout(false); cinePlay(true); box.focus();
+}
+function cineClose() {
+  if (!cine.on) return;
+  cine.on = false; clearTimeout(cine.timer); clearTimeout(cine.again); vo.stop();
+  writers.delete(cine.roll); writers.delete(cine.card); ticks.delete(cineTick); cine.roll = cine.card = null;
+  fit($('cine-roll'), 1, 1);            // give the long canvas back
+  st.read = cine.was.read; st.sound = cine.was.sound; music();
+  $('cine').hidden = true; root.classList.remove('cine-on');
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  W.roll.o.rate = st.rate; W.roll.on = st.playing;
+  $('cine-open').focus();
+}
+function cineWire() {
+  const box = $('cine');
+  $('cine-open').addEventListener('click', cineOpen);
+  $('cine-close').addEventListener('click', cineClose);
+  $('cine-play').addEventListener('click', () => cinePlay(!cine.playing));
+  $('cine-again').addEventListener('click', () => { cineLayout(false); cinePlay(true); box.focus(); });
+  for (const id of ['cine-clay', 'cine-sand', 'cine-rain']) $(id).addEventListener('click', () => {
+    $('pen-' + $(id).dataset.pen).click();          // the page's own switch, so the two agree
+    press(['cine-clay', 'cine-sand', 'cine-rain'], id); cine.roll.setPen(st.pen); cine.card.setPen(st.pen); cineByline();
+  });
+  toggle('cine-sound', on => { st.sound = on; music(); });
+  toggle('cine-cap', on => { box.classList.toggle('nocap', !on); });
+  toggle('cine-read', on => {
+    const w = cine.roll; st.read = on;
+    if (!on) { vo.stop(); w.o.rate = st.rate; return; }
+    if (cine.phase !== 'roll' || w.i >= w.main) return;
+    const from = W.sent.starts[W.sent.of[w.i]];     // from the top of the sentence being written
+    w.reset(from); vo.say(W.sent.of[from]);
+  });
+  for (const type of ['pointermove', 'pointerdown']) box.addEventListener(type, cineWake);
+  box.addEventListener('keydown', e => {
+    cineWake();
+    if (e.key === 'Escape') cineClose();
+    else if (e.key === ' ' && e.target === box) { e.preventDefault(); cinePlay(!cine.playing); }
+    else if (e.key === 'Tab') {                     // the page behind is out of reach while this is up
+      const all = [...box.querySelectorAll('button')].filter(b => b.offsetParent), first = all[0], last = all[all.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === box)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement === box) cine.full = true; else if (cine.on && cine.full) cineClose();
+  });
+  new ResizeObserver(() => {
+    if (!cine.on || box.clientWidth === cine.w && box.clientHeight === cine.h) return;
+    clearTimeout(cine.again); cine.again = setTimeout(() => { if (cine.on) cineLayout(true); }, 150);
+  }).observe(box);
+}
+
 function wire() {
   $('play').addEventListener('click', () => {
     if (W.roll.done) return restart(0);
@@ -813,7 +1060,7 @@ function wire() {
 }
 const start = () => {
   try { const t = localStorage.getItem('yisu-theme'); if (t === 'light' || t === 'dark') root.dataset.theme = t; } catch (e) { /* follow the system */ }
-  wire(); sync(true); requestAnimationFrame(frame);
+  wire(); cineWire(); sync(true); requestAnimationFrame(frame);
 };
 start();
 })();

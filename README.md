@@ -2,7 +2,7 @@
 
 The site for 一粟 (Yisu), three hand-drawn open-source Chinese fonts: 印泥 (the Typewriter), 畫沙 (the Ballpoint) and 漏痕 (the Marker). The fonts are built in [zjlgdx/pinboard-fonts](https://github.com/zjlgdx/pinboard-fonts), where their files still carry the name Pinboard.
 
-The page writes its texts a stroke at a time, in vertical columns from right to left: 王羲之's 蘭亭集序 by day (the theme 天雨粟) and the opening of 蘇軾's 前赤壁賦 by night (鬼夜哭). Nothing on it is a picture of type. The scroll is drawn on a canvas from the fonts' own centre lines with the fonts' own pens; everything else, the specimens and the box to type in included, is set in the fonts themselves. A recorded voice can read each sentence as it is written, and the writing keeps time with it.
+The page writes its texts a stroke at a time, in vertical columns from right to left: 王羲之's 蘭亭集序 by day (the theme 天雨粟) and the opening of 蘇軾's 前赤壁賦 by night (鬼夜哭). Nothing on it is a picture of type. The scroll is drawn on a canvas from the fonts' own centre lines with the fonts' own pens; everything else, the specimens and the box to type in included, is set in the fonts themselves. A recorded voice can read each sentence as it is written, and the writing keeps time with it. 觀影 opens the scroll alone on a dark screen, large, with the reading and the music on: a title, the text six characters to a column (eight on an upright screen) with the camera following the pen and the clause being written as a caption, then the whole scroll end to end.
 
 ## The name
 
