@@ -749,13 +749,32 @@ vo.hold = on => {                       // with the writing, when it pauses and 
   if (!vo.live) return;
   if (on) vo.el.pause(); else { vo.deadline = performance.now() + (vo.dur - vo.el.currentTime) * 1000 + 5000; const p = vo.el.play(); if (p) p.catch(() => { vo.live = false; }); }
 };
-const bgm = new Audio(); bgm.loop = true; bgm.preload = 'none'; bgm.volume = 0.6;
-bgm.addEventListener('error', () => { if (st.sound) { st.sound = false; $('sound').setAttribute('aria-pressed', false); $('note').textContent = '配樂沒有載入。'; } });
+/* The music, through Web Audio: a looping <audio> leaves a gap at each turn, and the night piece
+   is still sounding where it wraps round; a buffer loops to the sample. Its gain is also the only
+   volume iOS lets a page set, so the music can step back for the voice there too. Only the piece
+   playing is kept decoded (about 34 MB); a change of theme crossfades. */
+const bgm = { ctx: null, out: null, name: '', now: null, level: 0.6, bufs: {} };
+function bgmFail() { if (st.sound) { st.sound = false; $('sound').setAttribute('aria-pressed', false); $('note').textContent = '配樂沒有載入。'; } }
 function music() {
-  if (!st.sound || document.hidden) { bgm.pause(); return; }
-  const src = `audio/${st.mode === 'dark' ? 'night' : 'day'}.mp3`;
-  if (!bgm.src.endsWith(src)) bgm.src = src;
-  const p = bgm.play(); if (p) p.catch(() => {});
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!st.sound || document.hidden) { if (bgm.ctx && bgm.ctx.state === 'running') bgm.ctx.suspend().catch(() => {}); return; }
+  if (!AC) return bgmFail();
+  if (!bgm.ctx) { bgm.ctx = new AC(); bgm.out = bgm.ctx.createGain(); bgm.out.gain.value = bgm.level; bgm.out.connect(bgm.ctx.destination); }
+  bgm.ctx.resume().catch(() => {});      // inside the click that turned it on, which is what lets it sound
+  const name = st.mode === 'dark' ? 'night' : 'day';
+  if (bgm.name === name) return;
+  bgm.name = name;
+  const got = bgm.bufs[name] || (bgm.bufs[name] = fetch(`audio/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : Promise.reject(r.status))
+    .then(b => new Promise((ok, no) => bgm.ctx.decodeAudioData(b, ok, no))));
+  got.then(buf => {
+    if (bgm.name !== name) return;
+    const c = bgm.ctx, t = c.currentTime, src = c.createBufferSource(), g = c.createGain();
+    src.buffer = buf; src.loop = true; src.connect(g); g.connect(bgm.out);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t + 1.5); src.start(t);
+    const old = bgm.now; bgm.now = { src, g };
+    if (old) { old.g.gain.setValueAtTime(old.g.gain.value, t); old.g.gain.linearRampToValueAtTime(0, t + 1.5); old.src.stop(t + 1.6); }
+    for (const k of Object.keys(bgm.bufs)) if (k !== name) delete bgm.bufs[k];
+  }, () => { delete bgm.bufs[name]; bgm.name = ''; bgmFail(); });
 }
 /* Where each sentence of a piece begins, and which sentence each character is in. */
 function sentences(w) {
@@ -884,7 +903,7 @@ function tick(dt) {
     m.save(); m.clearRect(0, 0, w.W, h); m.translate(0, h); m.scale(1, -0.3); m.drawImage(w.cv, 0, 0, w.W, w.H); m.restore();
   }
   const want = vo.live && !vo.el.paused ? 0.22 : 0.6;     // the music steps back for the voice
-  if (st.sound && Math.abs(bgm.volume - want) > 0.005) bgm.volume += (want - bgm.volume) * Math.min(1, dt / 350);
+  if (bgm.out && Math.abs(bgm.level - want) > 0.005) { bgm.level += (want - bgm.level) * Math.min(1, dt / 350); bgm.out.gain.value = bgm.level; }
 }
 /* Day or night, from the tokens, so it follows the reader's setting and the switch alike. Each
    brings its own text, until the reader has chosen one; then the writing carries on where it was. */
