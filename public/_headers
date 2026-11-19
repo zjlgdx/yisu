@@ -1,0 +1,10 @@
+# Fonts, stroke data and sound change only when the fonts or the texts do: a day in the
+# cache, and a week more while a newer copy is fetched behind.
+/fonts/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/audio/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/strokes*.js
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/og.png
+  Cache-Control: public, max-age=86400

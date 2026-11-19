@@ -29,10 +29,11 @@ def thin(pts, tol):
         return pts
     (ax, ay), (bx, by) = pts[0], pts[-1]
     dx, dy = bx - ax, by - ay
-    n = (dx * dx + dy * dy) ** 0.5 or 1
+    n = (dx * dx + dy * dy) ** 0.5
     far, at = 0, 0
     for i, (x, y) in enumerate(pts[1:-1], 1):
-        d = abs((x - ax) * dy - (y - ay) * dx) / n
+        # A stroke that ends where it began (the ring of 。) has no chord to measure from.
+        d = abs((x - ax) * dy - (y - ay) * dx) / n if n > 1e-6 else ((x - ax) ** 2 + (y - ay) ** 2) ** 0.5
         if d > far:
             far, at = d, i
     if far <= tol:

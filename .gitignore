@@ -2,3 +2,6 @@ __pycache__/
 .DS_Store
 .wrangler/
 node_modules/
+.audio-cache*
+# Every font cut into slices for the tester: about 45 MB, made by tools/webfonts.py FONTS full.
+public/fonts/full/
