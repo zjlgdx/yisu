@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>一粟 Yisu · 立於一畫</title>
+<meta name="description" content="一粟是三套手寫的開源中文字型：印泥、畫沙、漏痕。六千多個常用字，一筆一劃重新寫過，臨而不摹。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="一粟 Yisu · 立於一畫">
+<meta property="og:description" content="三套手寫的開源中文字型：印泥、畫沙、漏痕。看它一筆一劃寫出《蘭亭集序》。">
+<meta property="og:image" content="https://yisu.aixie.de/og.png">
+<meta name="theme-color" content="#efeee9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b3362b'/%3E%3Cpath d='M11 7c5 3 9 8 10 14 .4 3-1.6 5-4 4.400-2.800-.700-4.200-3.600-3.600-6.400.700-3.600-.400-7.600-2.400-12z' fill='%23f6efe6'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/yisu-huasha.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* One site, two themes from the line the name's story comes from: 天雨粟 by day (rice paper, a
+   mounted handscroll), 鬼夜哭 by night (moon, river, the text mirrored in the water). What
+   differs between them is all in the tokens. */
+@font-face { font-family: "Yisu Huasha"; src: url(fonts/yisu-huasha.woff2) format("woff2"); font-display: swap; }
+:root {
+  --mode: light; color-scheme: light;
+  --paper: #efeee9; --fibre: #e3e1d9; --panel: #f6f5f1; --ink: #1d1c1b; --soft: #5e5b55; --seal: #b3362b; --accent: #b3362b; --line: #cfccc2;
+  --band: #56707c; --band-w: 14px; --grain: #a87722; --on-bg: #1d1c1b; --on-fg: #efeee9;
+  --night-block: none; --night-flex: none; --glow: none;
+  --paper-image: radial-gradient(var(--fibre) .6px, transparent .7px), radial-gradient(var(--fibre) .5px, transparent .6px);
+  --paper-size: 7px 9px, 11px 13px;
+  --text: "Yisu Huasha", "Songti TC", "Noto Serif TC", "PMingLiU", serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
+:root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
+html, body { height: auto; }
+body { margin: 0; background-color: var(--paper); background-image: var(--paper-image); background-size: var(--paper-size); background-position: 0 0, 3px 5px;
+  color: var(--ink); font-family: var(--text); font-size: 18px; line-height: 1.7; }
+canvas { display: block; max-width: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rain { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.ctl { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; font-size: 15px; }
+.ctl .seg { display: inline-flex; border: 1px solid currentColor; border-radius: 3px; overflow: hidden; }
+.ctl button { background: none; border: 1px solid currentColor; border-radius: 3px; padding: 5px 12px; line-height: 1.4; }
+.ctl .seg button { border: 0; border-radius: 0; }
+.ctl .seg button + button { border-left: 1px solid currentColor; }
+.ctl button[aria-pressed="true"] { background: var(--on-bg); color: var(--on-fg); }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: space-between; font-size: 16px; color: var(--soft); }
+nav .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); }
+nav .links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+nav a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+nav a:hover { border-color: var(--accent); color: var(--ink); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: start; margin-top: 22px; }
+.sky { display: var(--night-flex); align-items: center; justify-content: space-between; gap: 20px; margin: 0 0 16px; }
+.sky p { margin: 0; color: var(--soft); font-size: 16px; letter-spacing: .2em; text-align: right; }
+.moon { flex: none; width: 84px; height: 84px; border-radius: 50%; margin-left: 4%;
+  background: radial-gradient(circle at 38% 36%, #fbf8ec, #ece8da 58%, #cfc9b4); box-shadow: 0 0 44px 10px rgba(236, 232, 218, .22); }
+.mount { border-block: var(--band-w) solid var(--band); background: var(--panel); box-shadow: 0 1px 0 var(--line), 0 -1px 0 var(--line); }
+.scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+#roll { filter: var(--glow); }
+.water { display: var(--night-block); height: 1px; background: linear-gradient(90deg, transparent, var(--soft), transparent); opacity: .6; }
+.mirror { display: var(--night-block); opacity: .2; filter: blur(1.2px); margin-top: 2px;
+  -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); }
+.under { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; margin-top: 14px; color: var(--soft); }
+.under .note { font-size: 15px; }
+.titlecol { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.titlecol .tag { writing-mode: vertical-rl; letter-spacing: .5em; color: var(--soft); font-size: 16px; }
+.seal { display: inline-block; background: var(--seal); padding: 5px; border-radius: 5px; line-height: 0; }
+
+h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accent); margin: 60px 0 6px; scroll-margin-top: 16px; }
+.lead { max-width: 34em; color: var(--soft); margin: 0 0 20px; }
+.pair { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; margin-top: 16px; }
+.pair p { margin: 0 0 12px; max-width: 36em; }
+.pair .from { color: var(--soft); font-size: 15px; }
+.pens { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.pen { padding: 20px 18px 8px; border-left: 1px solid var(--line); min-width: 0; }
+.pen:first-child { border-left: 0; padding-left: 0; }
+.pen .row { display: flex; align-items: flex-end; gap: 12px; }
+.pen q { display: block; color: var(--accent); margin: 10px 0 4px; quotes: none; letter-spacing: .12em; }
+.pen p { margin: 0; color: var(--soft); font-size: 16px; }
+.lib { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 28px; align-items: start; }
+.cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.cells button { border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: none; padding: 5px; display: grid; place-items: center; }
+.cells button[aria-pressed="true"] { background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.big { border: 1px solid var(--line); background-color: var(--panel); padding: 10px; position: relative;
+  background-image: linear-gradient(var(--line), var(--line)), linear-gradient(var(--line), var(--line)); background-size: 100% 1px, 1px 100%; background-position: center, center; background-repeat: no-repeat; }
+.big .count { position: absolute; left: 10px; bottom: 6px; font-size: 14px; color: var(--soft); }
+.ask { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 0 0 16px; font-size: 16px; }
+.ask input { width: 4.5em; font: inherit; text-align: center; padding: 4px 8px; border: 1px solid var(--ink); border-radius: 3px; background: var(--panel); color: var(--ink); }
+.ask button { border: 1px solid var(--on-bg); border-radius: 3px; padding: 4px 16px; background: var(--on-bg); color: var(--on-fg); }
+.ask output { color: var(--soft); font-size: 15px; flex-basis: 100%; min-height: 1.7em; }
+.get { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.get a { text-decoration: none; padding: 8px 18px; border: 1px solid var(--ink); color: var(--ink); border-radius: 3px; }
+.get a.main { background: var(--on-bg); border-color: var(--on-bg); color: var(--on-fg); }
+footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--soft); font-size: 15px; }
+footer a { color: inherit; }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: minmax(0, 1fr); } .titlecol { flex-direction: row; justify-content: flex-start; order: -1; }
+  .pens { grid-template-columns: minmax(0, 1fr); } .pen { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } .pen:first-child { border-top: 0; }
+  .lib, .pair { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<canvas class="rain" id="rain" aria-hidden="true"></canvas>
+<div class="wrap">
+  <nav aria-label="網站導覽">
+    <span class="brand"><canvas class="ink" data-t="&#xE000;" data-pen="sand" data-bold="1" data-cell="30" aria-hidden="true"></canvas><canvas class="ink" data-t="一粟" data-pen="sand" data-cell="26" data-h="1" role="img" aria-label="一粟"></canvas><span>Yisu</span></span>
+    <span class="links"><a href="#hero" data-to="hero">寫卷</a><a href="#name" data-to="name">名</a><a href="#pens" data-to="pens">三筆</a><a href="#lib" data-to="lib">字庫</a><a href="#creed" data-to="creed">下載</a></span>
+    <span class="ctl"><span class="seg" role="group" aria-label="明暗主題"><button id="theme-light" data-set="light" aria-pressed="true">天雨粟</button><button id="theme-dark" data-set="dark" aria-pressed="false">鬼夜哭</button></span></span>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div style="min-width:0">
+      <div class="sky" aria-hidden="true"><div class="moon"></div><p>月出於東山之上，徘徊於斗牛之間。</p></div>
+      <div class="mount"><div class="scroll" id="scroll" tabindex="0" aria-label="直排書卷，可左右捲動">
+        <canvas id="roll" role="img"></canvas><div class="water" aria-hidden="true"></div><canvas class="mirror" id="mirror" aria-hidden="true"></canvas>
+      </div></div>
+      <div class="under">
+        <div class="ctl">
+          <button id="play" aria-pressed="true">暫停</button>
+          <span class="seg" role="group" aria-label="換一卷">
+            <button id="piece-lanting" data-piece="lanting" aria-pressed="true">蘭亭集序</button><button id="piece-chibi" data-piece="chibi" aria-pressed="false">前赤壁賦</button>
+          </span>
+          <span class="seg" role="group" aria-label="換筆">
+            <button id="pen-clay" data-pen="clay" aria-pressed="false">印泥</button><button id="pen-sand" data-pen="sand" aria-pressed="true">畫沙</button><button id="pen-rain" data-pen="rain" aria-pressed="false">漏痕</button>
+          </span>
+          <button id="sound" aria-pressed="false">配樂</button>
+          <button id="read" aria-pressed="false">朗讀</button>
+          <span class="seg" role="group" aria-label="速度">
+            <button id="slow" data-rate="0.5" aria-pressed="false">慢</button><button id="mid" data-rate="1" aria-pressed="true">中</button><button id="fast" data-rate="3.2" aria-pressed="false">快</button>
+          </span>
+          <button id="again">重寫</button>
+        </div>
+        <span class="note" id="note"></span>
+      </div>
+    </div>
+    <div class="titlecol">
+      <canvas id="title" role="img" aria-label="一粟，注音 ㄧ ㄙㄨˋ"></canvas>
+      <span class="tag">立於一畫</span>
+      <span class="seal" title="一粟"><canvas class="ink" data-t="一粟" data-pen="rain" data-bold="1" data-cell="30" data-color="#f6efe6" aria-hidden="true"></canvas></span>
+    </div>
+  </section>
+
+  <h2 id="name">一粟之名</h2>
+  <div class="pair">
+    <canvas id="quote" role="img" aria-label="寄蜉蝣於天地，渺滄海之一粟。"></canvas>
+    <div>
+      <p>一粟，是一粒小米。蘇軾在赤壁的船上說，人活在天地之間，像滄海裡的一粒粟。</p>
+      <p>《淮南子》記倉頡造字那天「天雨粟，鬼夜哭」：天上落下粟來，鬼在夜裡哭。這套字是那場雨裡的一粒，所以網站白天叫天雨粟，夜裡叫鬼夜哭。</p>
+      <p>「一」是最簡單的字，只有一畫。石濤說：「法於何立？立於一畫。」</p>
+      <p class="from">蘇軾《前赤壁賦》 · 《淮南子·本經訓》 · 石濤《畫語錄》</p>
+    </div>
+  </div>
+
+  <h2 id="pens">三筆</h2>
+  <p class="lead">同一個字，三支筆各寫一遍。名字借自古人論筆法的三個比喻。</p>
+  <div class="pens">
+    <div class="pen"><div class="row"><canvas class="ink" data-t="永" data-pen="clay" data-cell="132" role="img" aria-label="印泥寫的永"></canvas><canvas class="ink" data-t="印泥" data-pen="clay" data-cell="34" role="img" aria-label="印泥"></canvas></div>
+      <q>如印印泥</q><p>仿宋鉛字，隔著色帶敲進紙裡。橫畫微微上揚，起筆、收筆都有一頓。</p></div>
+    <div class="pen"><div class="row"><canvas class="ink" data-t="永" data-pen="sand" data-cell="132" role="img" aria-label="畫沙寫的永"></canvas><canvas class="ink" data-t="畫沙" data-pen="sand" data-cell="34" role="img" aria-label="畫沙"></canvas></div>
+      <q>如錐畫沙</q><p>原子筆寫的楷書。硬筆尖就是那支錐，力道有輕有重，每一筆都略略偏離原位。</p></div>
+    <div class="pen"><div class="row"><canvas class="ink" data-t="永" data-pen="rain" data-cell="132" role="img" aria-label="漏痕寫的永"></canvas><canvas class="ink" data-t="漏痕" data-pen="rain" data-cell="34" role="img" aria-label="漏痕"></canvas></div>
+      <q>如屋漏痕</q><p>麥克筆的斜切筆尖，粗細全由筆尖的角度決定，像雨水沿牆留下的痕。</p></div>
+  </div>
+
+  <h2 id="lib">字庫</h2>
+  <p class="lead">六千一百一十五個常用字，繁體、簡體和注音。點一個字，或自己寫一個，看它一筆一筆寫出來。</p>
+  <form class="ask" id="ask"><label for="ask-in">想看哪個字</label><input id="ask-in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="ask-msg"><button type="submit">寫</button><output id="ask-msg"></output></form>
+  <div class="lib">
+    <div class="cells" id="cells" role="group" aria-label="選一個字"></div>
+    <div class="big"><canvas id="big" role="img" aria-label="放大的筆順"></canvas><span class="count" id="count"></span></div>
+  </div>
+
+  <h2 id="creed">臨而不摹</h2>
+  <div class="pair">
+    <canvas class="ink" data-t="臨而不摹" data-pen="sand" data-cell="58" role="img" aria-label="臨而不摹"></canvas>
+    <div>
+      <p>書法裡，摹是把紙蒙在帖上描，臨是看著帖自己寫。一粟的每一個字都是臨的：看清楚一個字是什麼，再用自己的筆重新寫出來，不描別人的字，也不量別人的字。</p>
+      <p>《蘭亭集序》的真跡早已不存，傳到今天的都是後人的臨本和摹本。這裡是又一次臨寫，換了三支今天的筆。</p>
+      <div class="get"><a class="main" href="https://github.com/zjlgdx/pinboard-fonts/releases" target="_blank" rel="noopener">下載字型</a><a href="https://github.com/zjlgdx/pinboard-fonts" target="_blank" rel="noopener">原始碼</a></div>
+      <p class="from" style="margin-top:14px">三套字型的檔名目前還是 Pinboard Typewriter（印泥）、Pinboard Ballpoint（畫沙）和 Pinboard Marker（漏痕），之後會改為一粟。</p>
+    </div>
+  </div>
+  <footer>字型以 SIL Open Font License 1.1 授權，可以自由使用和修改。這一頁的字，連同你正在讀的這一行，都是一粟自己寫的。<a href="https://github.com/zjlgdx/yisu" target="_blank" rel="noopener">網站原始碼</a></footer>
+</div>
+
+<script src="strokes.js"></script>
+<script>
+(() => {
+'use strict';
+const S = window.YISU_STROKES || {};
+// The logo's 點: one stroke, a grain of millet and the first stroke of 永.
+S[''] = [['D', [380, 230, 450, 300, 520, 390, 575, 500, 600, 640, 590, 740]]];
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- the three pens, from the fonts' own cuts ---------- */
+const PENS = {
+  clay: { cut: 'fang', r: [26.9, 34.5], nib: [1.12, 0.70], rise: 5.5, lean: 0, narrow: 0.90, tall: 1.03, hand: 0, face: 0.883, worn: true },
+  sand: { cut: 'hand', r: [25.8, 35.7], nib: [1.0, 0.93], rise: 4.5, lean: 4, narrow: 1, tall: 1, hand: 1, face: 0.90 },
+  rain: { cut: 'even', hw: [47.1, 58.5], ht: [10.9, 15], angle: 35, rise: 3, lean: 0, narrow: 1, tall: 1, hand: 0.6, face: 0.94 },
+};
+const ease = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+function profile(kind, t, cut) {
+  if (cut === 'even') return 1;
+  if (cut === 'hand') return profile(kind, t, 'kai') * (0.86 + 0.14 * Math.sin(Math.PI * Math.min(1, t * 1.1)));
+  if (cut === 'fang') {
+    if (kind === 'E') return 1 + 0.32 * (1 - ease(0, .1, t)) + 0.16 * ease(.9, 1, t);
+    if (kind === 'G') return 1 + 0.32 * (1 - ease(0, .1, t)) - 0.5 * ease(.86, 1, t);
+    if (kind === 'P') return 1.15 - 0.62 * ease(.35, 1, t);
+    if (kind === 'N') return 0.75 + 0.55 * ease(0, .8, t) - 0.6 * ease(.85, 1, t);
+    return 0.7 + 0.6 * ease(0, .9, t);
+  }
+  if (kind === 'E') return 1 + 0.14 * (1 - ease(0, .08, t));
+  if (kind === 'P') return 1.08 - 0.5 * ease(.45, 1, t);
+  if (kind === 'G') return 1 + 0.14 * (1 - ease(0, .06, t)) - 0.45 * ease(.86, 1, t);
+  if (kind === 'N') return 0.82 + 0.38 * ease(0, .78, t) - 0.55 * ease(.82, 1, t);
+  return 0.7 + 0.5 * ease(0, .9, t);
+}
+function rng(seed) { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gauss = r => Math.sqrt(-2 * Math.log(r() + 1e-9)) * Math.cos(6.2832 * r());
+const seedOf = s => { let h = 7; for (const c of s) h = Math.imul(h, 31) + c.codePointAt(0) | 0; return h; };
+
+/* A character's strokes for one pen and size: points every `step` px, with t along each stroke. */
+const cache = new Map();
+function prepare(ch, pk, cell) {
+  const key = ch + '|' + pk + '|' + cell;
+  if (cache.has(key)) return cache.get(key);
+  const src = S[ch];
+  if (!src) { cache.set(key, null); return null; }
+  const P = PENS[pk], r = rng(seedOf(pk + ch)), k = cell / 1000 * P.face;
+  const rise = Math.tan(P.rise * Math.PI / 180), lean = Math.tan(P.lean * Math.PI / 180);
+  const dy0 = (r() * 2 - 1) * 10, rot = (r() * 2 - 1) * 1.1 * Math.PI / 180, cr = Math.cos(rot), sr = Math.sin(rot);
+  const step = Math.max(0.55, cell * 0.011);
+  const out = [];
+  for (const [kind, a] of src) {
+    let jx = 0, jy = 0, c = 1, s = 0, jf = 1;
+    if (P.hand) { jx = gauss(r) * 9 * P.hand; jy = gauss(r) * 9 * P.hand; const ja = gauss(r) * 2.2 * P.hand * Math.PI / 180; c = Math.cos(ja); s = Math.sin(ja); jf = 1 + gauss(r) * 0.035 * P.hand; }
+    const sx = a[0], sy = a[1], line = [];
+    for (let i = 0; i < a.length; i += 2) {
+      const ux = (a[i] - sx) * jf, uy = (a[i + 1] - sy) * jf;
+      let x = sx + ux * c - uy * s + jx, y = sy + ux * s + uy * c + jy;
+      y -= rise * (x - 500); x = 500 + (x - 500) * P.narrow; y = 500 + (y - 500) * P.tall; x -= lean * (y - 500);
+      x = (x - 500) * k; y = (y - 500 + dy0) * k;
+      line.push(x * cr - y * sr + cell / 2, x * sr + y * cr + cell / 2);
+    }
+    let len = 0; const seg = [];
+    for (let i = 2; i < line.length; i += 2) { const d = Math.hypot(line[i] - line[i - 2], line[i + 1] - line[i - 1]); seg.push(d); len += d; }
+    const n = Math.max(2, Math.floor(len / step) + 1), pts = new Float32Array(n * 3);
+    let j = 0, acc = 0;
+    for (let q = 0; q < n; q++) {
+      const d = len * q / (n - 1);
+      while (j < seg.length - 1 && acc + seg[j] < d) { acc += seg[j]; j++; }
+      const f = seg[j] ? (d - acc) / seg[j] : 0, i = j * 2;
+      pts[q * 3] = line[i] + (line[i + 2] - line[i]) * f; pts[q * 3 + 1] = line[i + 1] + (line[i + 3] - line[i + 1]) * f; pts[q * 3 + 2] = q / (n - 1);
+    }
+    out.push({ kind, pts, n, short: len / k < 27 });
+  }
+  out.step = step; out.k = k;
+  cache.set(key, out);
+  return out;
+}
+const nibs = new Map();
+function nibShape(pk, bold, k) {
+  const key = pk + bold + k;
+  if (nibs.has(key)) return nibs.get(key);
+  const P = PENS[pk], a = P.angle * Math.PI / 180, hw = P.hw[bold] * k, ht = P.ht[bold] * k, path = new Path2D();
+  for (let q = 0; q < 24; q++) {
+    const th = 2 * Math.PI * q / 24, c = Math.cos(th), s = Math.sin(th);
+    const x = Math.sign(c) * Math.abs(c) ** 0.3 * hw, y = Math.sign(s) * Math.abs(s) ** 0.3 * ht;
+    const px = Math.cos(a) * x + Math.sin(a) * y, py = -Math.sin(a) * x + Math.cos(a) * y;
+    q ? path.lineTo(px, py) : path.moveTo(px, py);
+  }
+  path.closePath(); nibs.set(key, path); return path;
+}
+/* Ink points from..to of one stroke at (ox, oy). */
+function stamp(ctx, g, st, from, to, pk, bold, ox, oy) {
+  const P = PENS[pk];
+  if (P.cut === 'even') {
+    const shape = nibShape(pk, bold, g.k);
+    for (let q = from; q < to; q++) { const x = ox + st.pts[q * 3], y = oy + st.pts[q * 3 + 1]; ctx.translate(x, y); ctx.fill(shape); ctx.translate(-x, -y); }
+    return;
+  }
+  const base = P.r[bold] * g.k;
+  ctx.beginPath();
+  for (let q = from; q < to; q++) {
+    const f = st.short ? 1.25 : profile(st.kind, st.pts[q * 3 + 2], P.cut), rad = Math.max(0.3, base * f);
+    const x = ox + st.pts[q * 3], y = oy + st.pts[q * 3 + 1];
+    ctx.moveTo(x + rad * P.nib[0], y); ctx.ellipse(x, y, rad * P.nib[0], rad * P.nib[1], 0, 0, 6.2832);
+  }
+  ctx.fill();
+}
+/* The Typewriter's worn ribbon: a few specks that didn't take ink. */
+function wear(ctx, ch, pk, cell, ox, oy) {
+  if (!PENS[pk].worn || cell < 22) return;
+  const r = rng(seedOf('w' + ch)); ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath();
+  for (let q = 0; q < 9; q++) { const x = ox + cell * (0.12 + 0.76 * r()), y = oy + cell * (0.12 + 0.76 * r()), rad = cell * (0.006 + 0.012 * r()); ctx.moveTo(x + rad, y); ctx.arc(x, y, rad, 0, 6.2832); }
+  ctx.fill(); ctx.restore();
+}
+function glyph(ctx, ch, pk, bold, ox, oy, cell) {
+  const g = prepare(ch, pk, cell); if (!g) return false;
+  for (const st of g) stamp(ctx, g, st, 0, st.n, pk, bold, ox, oy);
+  wear(ctx, ch, pk, cell, ox, oy); return true;
+}
+function fit(cv, w, h) {
+  cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR);
+  const ctx = cv.getContext('2d'); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); return ctx;
+}
+/* Static words: <canvas class="ink" data-t data-pen data-cell [data-h] [data-bold] [data-color]> */
+function inkAll(root) {
+  for (const cv of root.querySelectorAll('canvas.ink')) {
+    const t = [...cv.dataset.t], cell = +cv.dataset.cell, h = cv.dataset.h === '1', bold = +(cv.dataset.bold || 0);
+    const ctx = fit(cv, h ? cell * t.length : cell, h ? cell : cell * t.length);
+    ctx.fillStyle = cv.dataset.color || getComputedStyle(cv).color;
+    t.forEach((ch, i) => glyph(ctx, ch, cv.dataset.pen, bold, h ? i * cell : 0, h ? 0 : i * cell, cell));
+  }
+}
+
+/* ---------- sound: five-note plucks, made here, one for each stroke ---------- */
+let AC = null, master = null;
+function audio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return AC; }
+  const Ctor = window.AudioContext || window.webkitAudioContext; if (!Ctor) return null;
+  AC = new Ctor(); master = AC.createGain(); master.gain.value = 0.5;
+  const delay = AC.createDelay(1); delay.delayTime.value = 0.23; const fb = AC.createGain(); fb.gain.value = 0.28; const wet = AC.createGain(); wet.gain.value = 0.35;
+  master.connect(AC.destination); master.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(AC.destination);
+  return AC;
+}
+const GONG = [0, 2, 4, 7, 9];           // 宮 商 角 徵 羽
+const hz = semis => 146.83 * 2 ** (semis / 12);
+function pluck(kind, ch, si) {
+  const ac = audio(); if (!ac) return;
+  const deg = (ch.codePointAt(0) + si * 2) % 5, oct = { E: 1, P: 1, G: 0, N: 0, D: 2 }[kind] ?? 1;
+  const f = hz(GONG[deg] + 12 * oct), t = ac.currentTime, dur = { E: 1.6, P: 1.2, G: 1.8, N: 2.4, D: 0.9 }[kind] ?? 1.4;
+  const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter();
+  o.type = 'triangle'; o2.type = 'sine'; o.frequency.setValueAtTime(f * 1.012, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.08);
+  if (kind === 'P') o.frequency.exponentialRampToValueAtTime(f * 0.94, t + dur);       // 撇: the note falls away
+  if (kind === 'G') o.frequency.setTargetAtTime(f * 1.06, t + dur * 0.55, 0.08);       // 鉤: a slide up at the end
+  o2.frequency.value = f * 2;
+  lp.type = 'lowpass'; lp.frequency.setValueAtTime(2400, t); lp.frequency.exponentialRampToValueAtTime(500, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(kind === 'D' ? 0.16 : 0.24, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  const g2 = ac.createGain(); g2.gain.value = 0.22;
+  o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(master);
+  o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
+}
+function breath(ch) {                    // 簫: one long soft note for a new phrase
+  const ac = audio(); if (!ac) return;
+  const f = hz(GONG[ch.codePointAt(0) % 5] + 12), t = ac.currentTime, dur = 3.4;
+  const o = ac.createOscillator(), g = ac.createGain(), l = ac.createOscillator(), lg = ac.createGain();
+  o.type = 'sine'; o.frequency.value = f; l.frequency.value = 4.6; lg.gain.value = f * 0.006; l.connect(lg); lg.connect(o.frequency);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.13, t + 0.7); g.gain.linearRampToValueAtTime(0.09, t + dur * 0.7); g.gain.linearRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); l.start(t); o.stop(t + dur); l.stop(t + dur);
+}
+function thud() { const ac = audio(); if (!ac) return; const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.22); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.32); }
+const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function speak(text) { if (!canSpeak) return; try { const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-TW'; u.rate = 0.7; u.pitch = 0.9; speechSynthesis.speak(u); } catch (e) { /* no voice here */ } }
+const hush = () => { if (canSpeak) try { speechSynthesis.cancel(); } catch (e) { /* nothing to stop */ } };
+
+/* ---------- the writer: a text in columns, right to left, a stroke at a time ---------- */
+const PUNCT = '，。、；：？！「」';
+const ENDS = '。！？；';
+class Writer {
+  constructor(cv, o) {
+    this.cv = cv; this.o = Object.assign({ pen: 'sand', bold: 0, cell: 48, gap: 12, rows: 10, pad: 20, speed: 3300, rate: 1, pre: 0, color: '#111', tail: null }, o);
+    this.on = false; this.build(); this.reset(this.o.pre);
+  }
+  build() {
+    const o = this.o, chars = [...o.text]; this.cols = Math.ceil(chars.length / o.rows);
+    let extra = 0; if (o.tail) extra = Math.ceil(o.tail.length / Math.floor(o.rows * o.cell / (o.cell * 0.6))) * o.cell * 0.6 + o.cell * 1.3 + o.gap * 2;
+    this.W = Math.max(o.minW || 0, this.cols * (o.cell + o.gap) - o.gap + o.pad * 2 + extra); this.H = o.rows * o.cell + o.pad * 2;
+    this.ctx = fit(this.cv, this.W, this.H);
+    this.items = chars.map((ch, i) => { const col = Math.floor(i / o.rows), row = i % o.rows; return { ch, cell: o.cell, row, x: this.W - o.pad - (col + 1) * o.cell - col * o.gap, y: o.pad + row * o.cell }; });
+    if (o.tail) {                       // 落款: smaller, one column on, then the seal
+      const c = Math.round(o.cell * 0.6), per = Math.floor(o.rows * o.cell / c), x0 = this.W - o.pad - this.cols * (o.cell + o.gap) - o.gap - c;
+      [...o.tail].forEach((ch, i) => this.items.push({ ch, cell: c, row: i % per, x: x0 - Math.floor(i / per) * c, y: o.pad + o.cell * 0.4 + (i % per) * c, tail: true }));
+      const last = this.items[this.items.length - 1];
+      this.items.push({ seal: true, cell: Math.round(o.cell * 1.1), x: last.x - (o.cell * 1.1 - c) / 2, y: Math.min(last.y + c * 1.5, this.H - o.pad - o.cell * 2.3), row: 1 });
+    }
+  }
+  reset(n = 0) {
+    this.ctx.clearRect(0, 0, this.W, this.H); this.i = 0; this.s = 0; this.p = 0; this.wait = 0; this.done = false;
+    this.ctx.fillStyle = this.o.color;
+    for (; this.i < Math.min(n, this.items.length); this.i++) this.whole(this.items[this.i]);
+    this.o.onReset && this.o.onReset(this);
+  }
+  whole(it) {
+    if (it.seal) return this.seal(it);
+    this.ctx.fillStyle = this.o.color; glyph(this.ctx, it.ch, this.o.pen, this.o.bold, it.x, it.y, it.cell);
+  }
+  seal(it) {
+    const c = this.ctx, s = it.cell, h = s * 2.05; c.save(); c.fillStyle = this.o.sealColor || '#b3362b';
+    c.beginPath(); c.roundRect(it.x, it.y, s, h, s * 0.1); c.fill(); c.fillStyle = this.o.sealInk || '#f6efe6';
+    glyph(c, '一', 'rain', 1, it.x + s * 0.06, it.y + s * 0.07, s * 0.88); glyph(c, '粟', 'rain', 1, it.x + s * 0.06, it.y + s * 1.05, s * 0.88); c.restore();
+  }
+  setPen(pk) {                          // everything written so far, again in the other pen
+    this.o.pen = pk; const upto = this.i; this.ctx.clearRect(0, 0, this.W, this.H);
+    for (let q = 0; q < upto && q < this.items.length; q++) this.whole(this.items[q]);
+    this.s = 0; this.p = 0;
+  }
+  step(dt) {
+    if (!this.on || this.done) return;
+    if (this.wait > 0) { this.wait -= dt * this.o.rate; if (this.wait > 0) return; }
+    const o = this.o; let budget = o.speed * dt / 1000 * o.rate;      // grid units this frame
+    while (budget > 0) {
+      if (this.i >= this.items.length) { this.done = true; o.onDone && o.onDone(this); return; }
+      const it = this.items[this.i];
+      if (it.seal) { this.seal(it); o.onSeal && o.onSeal(); this.i++; this.wait = 300; return; }
+      const g = prepare(it.ch, o.pen, it.cell);
+      if (!g) { this.i++; continue; }
+      if (this.s === 0 && this.p === 0) o.onChar && o.onChar(this, it, this.i);
+      const st = g[this.s];
+      if (this.p === 0) o.onStroke && o.onStroke(st.kind, it, this.s, g.length, st);
+      const per = g.step / g.k, adv = Math.max(1, Math.round(budget / per)), to = Math.min(st.n, this.p + adv);
+      this.ctx.fillStyle = o.color; stamp(this.ctx, g, st, this.p, to, o.pen, o.bold, it.x, it.y);
+      budget -= (to - this.p) * per; this.p = to;
+      if (to >= st.n) {
+        this.s++; this.p = 0;
+        if (this.s >= g.length) { wear(this.ctx, it.ch, o.pen, it.cell, it.x, it.y); this.s = 0; this.i++; this.wait = PUNCT.includes(it.ch) ? 380 : 120; o.onCharEnd && o.onCharEnd(this, it); }
+        else this.wait = 55;
+        return;
+      }
+    }
+  }
+}
+const writers = new Set();
+let last = performance.now();
+function frame(now) { const dt = Math.min(60, now - last); last = now; for (const w of writers) w.step(dt); for (const f of ticks) f(dt); requestAnimationFrame(frame); }
+const ticks = new Set();
+
+/* ---------- small helpers for the controls ---------- */
+const $ = id => document.getElementById(id);
+function seg(ids, pick) { for (const id of ids) $(id).addEventListener('click', () => { for (const j of ids) $(j).setAttribute('aria-pressed', j === id); pick($(id)); }); }
+function toggle(id, fn) { $(id).addEventListener('click', () => { const on = $(id).getAttribute('aria-pressed') !== 'true'; $(id).setAttribute('aria-pressed', on); fn(on); }); }
+function sentenceAt(items, i) { let t = ''; for (let q = i; q < items.length && !items[q].tail && !items[q].seal; q++) { t += items[q].ch; if (ENDS.includes(items[q].ch)) break; } return t.replace(/[「」]/g, ''); }
+const newPhrase = (items, i) => i === 0 || (items[i - 1] && '，。、；：？！'.includes(items[i - 1].ch));
+const narrow = () => window.innerWidth < 620;
+const stems = '甲乙丙丁戊己庚辛壬癸', branches = '子丑寅卯辰巳午未申酉戌亥';
+const year = new Date().getFullYear(), ganzhi = stems[(year - 4) % 10] + branches[(year - 4) % 12];
+
+const LANTING = '永和九年，歲在癸丑，暮春之初，會于會稽山陰之蘭亭，脩禊事也。群賢畢至，少長咸集。此地有崇山峻領，茂林脩竹；又有清流激湍，暎帶左右，引以為流觴曲水，列坐其次。雖無絲竹管弦之盛，一觴一詠，亦足以暢敘幽情。是日也，天朗氣清，惠風和暢，仰觀宇宙之大，俯察品類之盛，所以遊目騁懷，足以極視聽之娛，信可樂也。夫人之相與，俯仰一世，或取諸懷抱，悟言一室之內；或因寄所託，放浪形骸之外。雖趣舍萬殊，靜躁不同，當其欣於所遇，暫得於己，快然自足，不知老之將至。及其所之既倦，情隨事遷，感慨係之矣。向之所欣，俛仰之間，已為陳迹，猶不能不以之興懷。況脩短隨化，終期於盡。古人云：「死生亦大矣。」豈不痛哉！每攬昔人興感之由，若合一契，未嘗不臨文嗟悼，不能喻之於懷。固知一死生為虛誕，齊彭殤為妄作。後之視今，亦猶今之視昔，悲夫！故列敘時人，錄其所述，雖世殊事異，所以興懷，其致一也。後之攬者，亦將有感於斯文。';
+const CHIBI = '壬戌之秋，七月既望，蘇子與客泛舟遊於赤壁之下。清風徐來，水波不興。舉酒屬客，誦明月之詩，歌窈窕之章。少焉，月出於東山之上，徘徊於斗牛之間。白露橫江，水光接天。縱一葦之所如，凌萬頃之茫然。浩浩乎如馮虛御風，而不知其所止；飄飄乎如遺世獨立，羽化而登仙。';
+
+/* ---------- the site ---------- */
+const root = document.documentElement;
+const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+const PIECES = {
+  lanting: { text: LANTING, tail: '王羲之蘭亭集序歲在' + ganzhi + '一粟書', label: '一筆一劃寫出的《蘭亭集序》', note: '王羲之《蘭亭集序》，東晉永和九年。每落一筆，響一聲五音。' },
+  chibi: { text: CHIBI, tail: '蘇軾前赤壁賦歲在' + ganzhi + '一粟書', label: '一筆一劃寫出的《前赤壁賦》', note: '蘇軾《前赤壁賦》開頭，北宋元豐五年。夜裡每起一句，多一聲簫。' },
+};
+const LIB = [...'永和九年歲在暮春之初會于山陰蘭亭群賢畢至少長咸集崇峻茂林脩竹清流激湍'];
+const st = { mode: '', piece: 'lanting', pen: 'sand', char: '永', sound: false, read: false, rate: 1, playing: true, asked: false, touched: 0, width: 0 };
+const W = {};
+const rain = { grains: [], sparks: [], ctx: null, w: 0, h: 0, color: '#a87722', alpha: 1, clock: 0 };
+const press = (ids, on) => { for (const id of ids) $(id).setAttribute('aria-pressed', id === on); };
+const seen = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
+  for (const e of es) if (e.isIntersecting && W.quote && !W.quote.begun) { W.quote.begun = true; W.quote.on = true; }
+}, { threshold: 0.4 }) : null;
+
+function init() {
+  const dark = st.mode === 'dark', ink = css('--ink'), piece = PIECES[st.piece], scroller = $('scroll');
+  writers.clear(); ticks.clear(); hush(); st.width = window.innerWidth;
+  inkAll(document);
+  // the scroll
+  const cell = narrow() ? 32 : 48;
+  $('roll').setAttribute('aria-label', piece.label); $('note').textContent = piece.note;
+  W.roll = new Writer($('roll'), {
+    text: piece.text, tail: piece.tail, pen: st.pen, cell, gap: Math.round(cell * 0.3), rows: 10, pad: Math.round(cell * 0.5), pre: 20,
+    color: ink, sealColor: css('--seal'), rate: st.rate, minW: scroller.clientWidth,
+    onStroke: (kind, it, si, n, stroke) => {
+      const r = $('roll').getBoundingClientRect(), x = r.left + it.x + stroke.pts[0], y = r.top + it.y + stroke.pts[1];
+      if (x > 0 && x < rain.w && y > 0 && y < rain.h) rain.sparks.push({ x, y, life: 1 });
+      if (st.sound) pluck(kind, it.ch, si);
+    },
+    onChar: (w, it, i) => {
+      if (st.sound && dark && !it.tail && newPhrase(w.items, i)) breath(it.ch);
+      if (st.read && !it.tail && (i === 0 || ENDS.includes(w.items[i - 1].ch))) speak(sentenceAt(w.items, i));
+      if (it.row === 0 && performance.now() - st.touched > 4000) scroller.scrollTo({ left: Math.max(0, it.x - scroller.clientWidth * 0.3), behavior: REDUCED ? 'auto' : 'smooth' });
+    },
+    onSeal: () => { if (st.sound) thud(); },
+  });
+  if (REDUCED && !st.asked) W.roll.reset(W.roll.items.length); else W.roll.on = st.playing;
+  writers.add(W.roll); scroller.scrollLeft = scroller.scrollWidth;
+  W.mirror = dark ? fit($('mirror'), W.roll.W, Math.round(W.roll.H * 0.3)) : null;
+  // the title, with its 注音 beside each character, as a column sets it
+  const big = narrow() ? 64 : 124, rb = Math.round(big * 0.3), tc = fit($('title'), big + rb * 1.7, big * 2 + 8);
+  tc.fillStyle = ink; glyph(tc, '一', 'sand', 0, 0, 0, big); glyph(tc, '粟', 'sand', 0, 0, big + 8, big);
+  tc.fillStyle = css('--accent'); glyph(tc, 'ㄧ', 'sand', 0, big + 2, big * 0.35, rb);
+  glyph(tc, 'ㄙ', 'sand', 0, big + 2, big + 8 + big * 0.16, rb); glyph(tc, 'ㄨ', 'sand', 0, big + 2, big + 8 + big * 0.16 + rb, rb); glyph(tc, 'ˋ', 'sand', 0, big + 2 + rb * 0.62, big + 8 + big * 0.16 + rb * 0.8, rb);
+  // the line the name comes from: written when it scrolls into view
+  W.quote = new Writer($('quote'), { text: '寄蜉蝣於天地，渺滄海之一粟。', pen: st.pen, cell: narrow() ? 40 : 54, gap: 20, rows: 7, pad: 6, color: css('--grain'), speed: 1700 });
+  if (REDUCED) W.quote.reset(W.quote.items.length); else if (seen) { seen.unobserve($('quote')); seen.observe($('quote')); } else W.quote.on = true;
+  writers.add(W.quote);
+  // the library
+  const box = $('cells'); box.textContent = '';
+  W.big = new Writer($('big'), { text: st.char, pen: st.pen, cell: narrow() ? 200 : 240, rows: 1, pad: 0, gap: 0, speed: 1500, color: ink,
+    onStroke: (kind, it, si, n) => { $('count').textContent = `第 ${si + 1} 筆，共 ${n} 筆`; },
+    onDone: w => setTimeout(() => { if (W.big === w && !REDUCED) { w.reset(0); w.on = true; } }, 2600) });
+  for (const ch of LIB) {
+    const b = document.createElement('button'), cv = document.createElement('canvas');
+    b.setAttribute('aria-label', ch); b.setAttribute('aria-pressed', ch === st.char);
+    cv.className = 'ink'; cv.dataset.t = ch; cv.dataset.pen = st.pen; cv.dataset.cell = 34; b.append(cv); box.append(b);
+    b.addEventListener('click', () => showChar(ch));
+  }
+  inkAll(box);
+  if (REDUCED) W.big.reset(1); else W.big.on = true;
+  writers.add(W.big);
+  // the sky: grains of millet falling, more of them at night
+  const cv = $('rain'), r = rng(27); rain.w = cv.width = window.innerWidth; rain.h = cv.height = window.innerHeight;
+  rain.ctx = cv.getContext('2d'); rain.color = css('--grain'); rain.alpha = dark ? 1 : 0.6; rain.sparks = [];
+  rain.grains = Array.from({ length: Math.round(rain.w / (dark ? 16 : 40)) }, () => ({ x: r() * rain.w, y: r() * rain.h, v: 30 + r() * 70, a: r() * 6.28, s: 1.2 + r() * 1.8, o: 0.15 + r() * 0.5 }));
+  tick(0); if (!REDUCED) ticks.add(tick);
+}
+function showChar(ch) {
+  st.char = ch; for (const o of $('cells').children) o.setAttribute('aria-pressed', o.getAttribute('aria-label') === ch);
+  $('big').setAttribute('aria-label', ch + ' 的筆順'); W.big.o.text = ch; W.big.build(); W.big.reset(REDUCED ? 1 : 0); W.big.on = !REDUCED;
+}
+/* Every other character the fonts have: fetched the first time a reader asks for one. */
+let whole = null;
+const loadAll = () => whole || (whole = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'strokes-all.js'; s.onload = ok; s.onerror = no; document.head.append(s); }));
+function tick(dt) {
+  const c = rain.ctx; c.clearRect(0, 0, rain.w, rain.h); c.fillStyle = rain.color;
+  for (const g of rain.grains) {
+    g.y += g.v * dt / 1000; g.x += Math.sin(g.a + g.y / 60) * 0.12; if (g.y > rain.h + 6) g.y = -6;
+    c.globalAlpha = g.o * rain.alpha; c.beginPath(); c.ellipse(g.x, g.y, g.s * 0.62, g.s, 0.5, 0, 6.2832); c.fill();
+  }
+  for (const s of rain.sparks) { s.life -= dt / 420; if (s.life > 0) { c.globalAlpha = s.life * 0.9; c.beginPath(); c.arc(s.x, s.y, 2 + (1 - s.life) * 7, 0, 6.2832); c.fill(); } }
+  rain.sparks = rain.sparks.filter(s => s.life > 0); c.globalAlpha = 1;
+  rain.clock += dt;
+  if (W.mirror && (rain.clock > 240 || dt === 0)) {      // the text again, upside down in the water
+    rain.clock = 0; const m = W.mirror, w = W.roll, h = Math.round(w.H * 0.3);
+    m.save(); m.clearRect(0, 0, w.W, h); m.translate(0, h); m.scale(1, -0.3); m.drawImage(w.cv, 0, 0, w.W, w.H); m.restore();
+  }
+}
+/* Day or night, from the tokens, so it follows the reader's setting and the switch alike.
+   Each brings its own text. */
+function sync(force) {
+  const m = css('--mode') || 'light';
+  if (m === st.mode && !force) return;
+  if (m !== st.mode) st.piece = m === 'dark' ? 'chibi' : 'lanting';
+  st.mode = m; press(['theme-light', 'theme-dark'], 'theme-' + m); press(['piece-lanting', 'piece-chibi'], 'piece-' + st.piece);
+  init();
+}
+function playing(on) { st.playing = on; $('play').setAttribute('aria-pressed', on); $('play').textContent = on ? '暫停' : '開卷'; }
+function wire() {
+  $('play').addEventListener('click', () => { st.asked = true; playing(!st.playing); if (st.playing && W.roll.done) W.roll.reset(0); W.roll.on = st.playing; if (!st.playing) hush(); });
+  seg(['pen-clay', 'pen-sand', 'pen-rain'], b => {
+    st.pen = b.dataset.pen; W.roll.setPen(st.pen); W.quote.setPen(st.pen); W.big.o.pen = st.pen; W.big.reset(0); W.big.on = !REDUCED; if (REDUCED) W.big.reset(1);
+    for (const cv of $('cells').querySelectorAll('canvas')) cv.dataset.pen = st.pen; inkAll($('cells'));
+  });
+  toggle('sound', on => { st.sound = on; if (on) audio(); });
+  toggle('read', on => { st.read = on; if (!on) hush(); else if (!canSpeak) $('read').textContent = '此處無法朗讀'; });
+  seg(['slow', 'mid', 'fast'], b => { st.rate = +b.dataset.rate; W.roll.o.rate = st.rate; });
+  $('again').addEventListener('click', () => { hush(); st.asked = true; playing(true); W.roll.reset(0); W.roll.on = true; $('scroll').scrollLeft = $('scroll').scrollWidth; });
+  seg(['piece-lanting', 'piece-chibi'], b => { st.piece = b.dataset.piece; init(); });
+  for (const id of ['theme-light', 'theme-dark']) $(id).addEventListener('click', () => {
+    root.dataset.theme = $(id).dataset.set; try { localStorage.setItem('yisu-theme', root.dataset.theme); } catch (e) { /* the choice lasts this visit only */ }
+    sync();
+  });
+  $('ask').addEventListener('submit', e => {
+    e.preventDefault(); const ch = [...$('ask-in').value.trim()].pop(); if (!ch) return;
+    $('ask-msg').textContent = '';
+    loadAll().then(() => { if (S[ch] && ch !== '\uE000') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千多個常用字，一輪一輪在補。`; },
+      () => { whole = null; $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
+  });
+  for (const ev of ['pointerdown', 'wheel', 'keydown']) $('scroll').addEventListener(ev, () => { st.touched = performance.now(); }, { passive: true });
+  for (const a of document.querySelectorAll('a[data-to]')) a.addEventListener('click', e => { e.preventDefault(); $(a.dataset.to).scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); });
+  new MutationObserver(() => sync()).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => sync());
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (window.innerWidth !== st.width) { cache.clear(); init(); } }, 300); });
+}
+const start = () => {
+  try { const t = localStorage.getItem('yisu-theme'); if (t === 'light' || t === 'dark') root.dataset.theme = t; } catch (e) { /* follow the system */ }
+  wire(); sync(true); requestAnimationFrame(frame);
+};
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(start, start); else start();
+})();
+</script>
+</body>
+</html>
