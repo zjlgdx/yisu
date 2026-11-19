@@ -20,7 +20,7 @@ from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont
 
 SITE = Path(__file__).resolve().parent.parent / 'public'
-HAND, HAND_LIGHT, MARKER = 'PinboardBallpoint-Bold', 'PinboardBallpoint-Regular', 'PinboardMarker-Bold'
+HAND, HAND_LIGHT, MARKER = 'YisuHuasha-Bold', 'YisuHuasha-Regular', 'YisuLouhen-Bold'
 # What each colour name means by day, by night, and inside the page (which has both).
 DAY = dict(ink='#1d1c1b', hot='#b3362b', seal='#b3362b', cream='#f6efe6', paper='#efeee9', chip='#f6f5f1')
 NIGHT = dict(ink='#ece8da', hot='#d9b45a', seal='#c4472f', cream='#f6efe6', paper='#0b0f17', chip='#121927')

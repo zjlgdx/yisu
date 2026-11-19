@@ -19,7 +19,7 @@ def draw(fonts, name=CHOSEN):
     out = Path(fonts) / 'out'
     im = Image.new('RGB', (1200, 630), PAPER)
     d = ImageDraw.Draw(im)
-    hand = lambda size: ImageFont.truetype(str(out / 'PinboardBallpoint-Regular.otf'), size)
+    hand = lambda size: ImageFont.truetype(str(out / 'YisuHuasha-Regular.otf'), size)
     d.text((110, 150), '一粟', font=hand(300), fill=INK)
     d.text((760, 190), '立於一畫', font=hand(64), fill=SOFT)
     d.text((760, 290), 'Yisu', font=hand(64), fill=SOFT)

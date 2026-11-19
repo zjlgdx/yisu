@@ -2,7 +2,7 @@
 
     FONTS/.venv/bin/python tools/strokes.py FONTS
 
-FONTS is a checkout of https://github.com/zjlgdx/pinboard-fonts. Every character
+FONTS is a checkout of https://github.com/zjlgdx/yisu-fonts. Every character
 there is a list of centre lines on a 1000 grid (y down), in the order they are
 drawn; this writes them as {char: [[kind, [x, y, x, y, ...]], ...]}:
 
