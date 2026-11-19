@@ -18,7 +18,9 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/huasha-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="fonts/faces.css">
+<!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
+     browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
+<link rel="stylesheet" href="fonts/faces.css?2">
 <style>
 /* One site, two themes from the line the name's story comes from: 天雨粟 by day (rice paper, a
    mounted handscroll), 鬼夜哭 by night (moon, river, the text mirrored in the water). What
@@ -406,7 +408,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   </div>
   <div class="cine-bar" aria-hidden="true"><i id="cine-bar"></i></div>
 </div>
-<script src="strokes.js"></script>
+<script src="strokes.js?2"></script>
 <script>
 (() => {
 'use strict';
@@ -716,7 +718,7 @@ const vo = { el: new Audio(), k: -1, live: false, until: 0, dur: 0, t0: 0, deadl
 vo.el.preload = 'auto';
 vo.el.addEventListener('ended', () => { vo.live = false; vo.until = performance.now() + 650; });      // a breath between sentences
 vo.el.addEventListener('error', () => { if (vo.live) { vo.live = false; $('note').textContent = '朗讀沒有載入。'; } });
-fetch('audio/vo.json').then(r => r.ok ? r.json() : null).then(d => { vo.times = d; }, () => {});
+fetch('audio/vo.json?2').then(r => r.ok ? r.json() : null).then(d => { vo.times = d; }, () => {});
 vo.busy = () => { if (vo.live && performance.now() > vo.deadline) vo.live = false; return vo.live || performance.now() < vo.until; };
 vo.say = k => {
   const times = vo.times && vo.times[st.piece];
@@ -838,18 +840,18 @@ function showChar(ch) {
 /* Every other character the fonts have: its strokes are fetched the first time a reader asks
    for one, and so are the fonts' own files, cut into slices by how common a character is. */
 let whole = null;
-const loadAll = () => whole || (whole = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'strokes-all.js'; s.onload = ok; s.onerror = no; document.head.append(s); }));
+const loadAll = () => whole || (whole = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'strokes-all.js?2'; s.onload = ok; s.onerror = no; document.head.append(s); }));
 let full = null;
-const fullFonts = () => full || (full = fetch('fonts/full/index.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(m => {
-  const order = [...m.order], hex = a => a.map(c => 'U+' + c.codePointAt(0).toString(16)).join(',');
+const fullFonts = () => full || (full = fetch('fonts/full/index.json?2').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(m => {
+  const order = [...m.order], hex = a => a.map(c => 'U+' + c.codePointAt(0).toString(16)).join(','), cut = m.v ? '?v=' + m.v : '';     // which cut of the fonts these slices are
   let rules = '';
   for (const f of m.fonts) {
     const skip = new Set(f.skip), face = `@font-face{font-family:"${f.family}";font-weight:${f.weight};font-display:swap;src:url(fonts/full/${f.file}-`;
     for (let q = 0; q * m.size < order.length; q++) {
       const part = order.slice(q * m.size, (q + 1) * m.size).filter(c => !skip.has(c));
-      if (part.length) rules += `${face}${String(q).padStart(2, '0')}.woff2) format("woff2");unicode-range:${hex(part)}}`;
+      if (part.length) rules += `${face}${String(q).padStart(2, '0')}.woff2${cut}) format("woff2");unicode-range:${hex(part)}}`;
     }
-    if (f.other) rules += `${face}a.woff2) format("woff2");unicode-range:${f.other}}`;
+    if (f.other) rules += `${face}a.woff2${cut}) format("woff2");unicode-range:${f.other}}`;
   }
   const s = document.createElement('style'); s.textContent = rules; document.head.append(s);
 }).catch(() => { full = null; }));

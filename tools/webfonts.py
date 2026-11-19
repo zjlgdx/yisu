@@ -89,7 +89,7 @@ def ranges(codes):
 def cut(job):
     """One subset: (source .otf, code points, where to write)."""
     src, codes, out = job
-    font = TTFont(src)
+    font = TTFont(src, recalcTimestamp=False)       # the same fonts in, the same bytes out
     opts = subset.Options()
     opts.flavor = 'woff2'
     opts.layout_features = ['*']
@@ -159,8 +159,13 @@ def main():
         if not k.startswith('full/'):
             print(f'{k}: {v // 1024} KB')
     if index:
+        # One mark for all the slices: the page puts it on their names, as faces.css does above.
+        every = hashlib.sha1()
+        for f in sorted((PUB / 'fonts' / 'full').glob('*.woff2')):
+            every.update(f.read_bytes())
+        cut_of = every.hexdigest()[:8]
         (PUB / 'fonts' / 'full' / 'index.json').write_text(
-            json.dumps({'size': SIZE, 'order': ''.join(map(chr, index_order)), 'fonts': index},
+            json.dumps({'size': SIZE, 'v': cut_of, 'order': ''.join(map(chr, index_order)), 'fonts': index},
                        ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         whole = [v for k, v in sizes.items() if k.startswith('full/')]
         print(f'full/: {len(whole)} files, {sum(whole) // 1048576} MB, {len(index_order)} characters in order')
