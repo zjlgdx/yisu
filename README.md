@@ -20,7 +20,7 @@ The page writes its texts a stroke at a time, in vertical columns from right to 
 | `public/audio/vo/`, `vo.json` | The narration, one clip per sentence, and each clip's length. Generated. |
 | `public/audio/day.mp3`, `night.mp3` | The music for each theme. Generated. |
 | `public/og.png` | The picture a link to the site shows. Generated. |
-| `public/favicon.svg`, `favicon.png`, `apple-touch-icon.png` | The mark: a red seal cut with 一粟, and its simpler form for browser tabs. Generated, as is the mark in the page's navigation. |
+| `public/favicon.svg`, `favicon.png`, `apple-touch-icon.png` | The mark: one stroke with a grain above it (滄海一粟), and its form for browser tabs, on a light tile so the stroke shows on dark tab bars. Generated, as is the mark in the page's navigation. |
 | `public/_headers` | Cache rules for the files above. |
 | `tools/` | The scripts that generate those files. |
 | `tools/extra.py` | Five characters the two texts need that the fonts don't draw yet, put together from parts the fonts already have. |
