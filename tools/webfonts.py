@@ -155,6 +155,11 @@ def main():
     mark = lambda m: f'url({m[1]}?v={hashlib.sha1((PUB / "fonts" / m[1]).read_bytes()).hexdigest()[:8]})'
     (PUB / 'fonts' / 'faces.css').write_text(
         '/* Made by tools/webfonts.py. */\n' + re.sub(r'url\(([\w-]+\.woff2)\)', mark, '\n'.join(faces)) + '\n', encoding='utf-8')
+    # The page preloads its own font: under the same name, mark and all, or a browser fetches it twice.
+    v = hashlib.sha1((PUB / 'fonts' / 'huasha-400.woff2').read_bytes()).hexdigest()[:8]
+    html, n = re.subn(r'href="fonts/huasha-400\.woff2(\?v=\w+)?"', f'href="fonts/huasha-400.woff2?v={v}"', html)
+    assert n == 1, 'the preload of huasha-400.woff2 in index.html'
+    (PUB / 'index.html').write_text(html, encoding='utf-8')
     for k, v in sizes.items():
         if not k.startswith('full/'):
             print(f'{k}: {v // 1024} KB')

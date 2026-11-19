@@ -4,20 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>一粟 Yisu · 立於一畫</title>
-<meta name="description" content="一粟是三套手寫的開源中文字型：印泥、畫沙、漏痕。六千多個常用字，一筆一劃重新寫過，臨而不摹。">
+<meta name="description" content="一粟是三套手寫的開源中文字型：印泥、畫沙、漏痕。六千八百多個常用字，一筆一劃重新寫過，臨而不摹。">
 <link rel="canonical" href="https://yisu.aixie.de/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yisu.aixie.de/">
 <meta property="og:title" content="一粟 Yisu · 立於一畫">
 <meta property="og:description" content="三套手寫的開源中文字型：印泥、畫沙、漏痕。看它一筆一劃寫出《蘭亭集序》。">
 <meta property="og:image" content="https://yisu.aixie.de/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="一粟：三套手寫的開源中文字型，印泥、畫沙、漏痕">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#efeee9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="fonts/huasha-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/huasha-400.woff2?v=9bdd6f9c" as="font" type="font/woff2" crossorigin>
 <!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
      browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
 <link rel="stylesheet" href="fonts/faces.css?2">
@@ -46,6 +49,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip:not(:focus) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip:focus { position: fixed; top: 8px; left: 8px; z-index: 50; padding: 8px 14px; background: var(--panel); color: var(--ink); border: 1px solid var(--ink); }
 /* The grains fall behind the page; only the spark where a stroke begins is drawn over it. */
 .rain, .sparks { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .rain { z-index: -1; } .sparks { z-index: 5; }
@@ -56,7 +61,7 @@ a { color: inherit; }
 .ctl button { background: none; border: 1px solid currentColor; border-radius: 3px; padding: 6px 14px; line-height: 1.4; min-height: 40px; min-width: 44px; }
 .ctl .seg button { border: 0; border-radius: 0; }
 .ctl .seg button + button { border-left: 1px solid currentColor; }
-.ctl button[aria-pressed="true"] { background: var(--on-bg); color: var(--on-fg); }
+.ctl button[aria-pressed="true"], .ctl button[data-on="true"] { background: var(--on-bg); color: var(--on-fg); }
 .ctl button:disabled { opacity: .4; cursor: default; }
 .ctl button svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .ctl label { display: inline-flex; align-items: center; gap: 8px; }
@@ -137,6 +142,7 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .big .count { position: absolute; left: 10px; bottom: 6px; font-size: 14px; color: var(--soft); }
 .three { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; font-size: 56px; line-height: 1.1; }
 .three span { display: grid; justify-items: center; gap: 2px; }
+.three i { font-style: normal; }
 .three small { font: 13px/1.4 var(--text); color: var(--soft); }
 .ask { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 0 0 16px; font-size: 16px; }
 .ask input { width: 4.5em; font: inherit; text-align: center; padding: 6px 8px; min-height: 28px; border: 1px solid var(--ink); border-radius: 3px; background: var(--panel); color: var(--ink); }
@@ -144,7 +150,7 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .ask output { color: var(--soft); font-size: 15px; flex-basis: 100%; min-height: 1.7em; }
 .try { border: 1px solid var(--line); background: var(--panel); margin-top: 12px; padding: 16px 20px; min-height: 2.6em; max-height: 70vh; overflow: auto;
   font: 400 44px/1.5 "Yisu Huasha", var(--text); white-space: pre-wrap; overflow-wrap: anywhere; }
-.try.v { writing-mode: vertical-rl; height: 8.4em; max-height: none; }
+.try.v { writing-mode: vertical-rl; height: 8.4em; max-height: none; width: 100%; box-sizing: border-box; }   /* its width would grow with the text */
 .facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 22px; margin: 4px 0 18px; max-width: 40em; }
 .facts dt { color: var(--soft); white-space: nowrap; } .facts dd { margin: 0; }
 .how { margin-top: 18px; max-width: 40em; }
@@ -218,6 +224,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 
 <canvas class="rain" id="rain" aria-hidden="true"></canvas>
 <canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
+<a class="skip" href="#hero">跳到正文</a>
 <div class="wrap">
   <nav aria-label="網站導覽">
     <a class="brand" href="#hero" data-to="hero"><!--mark--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class="mark" aria-hidden="true"><path fill="var(--ink)" d="M921 630C916 630 905 631 897 632C889 632 876 633 869 634C840 636 820 637 756 642C749 643 736 644 729 644C721 645 708 646 700 647C675 649 658 650 647 651C641 651 630 652 621 653C608 654 595 655 565 658C558 659 545 659 537 660C529 661 517 662 509 662C502 663 488 664 481 664C445 667 437 668 425 669C417 669 404 670 397 671C389 671 376 672 368 673C360 674 349 674 343 675C333 676 323 676 290 679C281 680 269 681 261 681C231 683 218 684 205 685C197 686 185 687 177 688C137 691 136 691 133 692C129 694 124 697 91 721C58 744 50 749 50 754C50 756 51 758 53 761C56 765 60 770 61 771C62 771 62 771 63 771C65 771 72 771 89 770C120 767 131 766 174 763C211 760 217 760 227 759C233 759 245 758 253 757C260 757 273 756 280 755C289 754 301 753 309 753C322 752 339 751 365 749C373 748 386 747 393 746C401 746 413 745 422 744C429 744 441 742 449 741C458 740 470 740 478 739C485 738 497 737 506 737C514 736 525 735 531 735C537 734 549 733 556 733C564 732 577 731 584 731C593 730 605 729 613 729C620 728 634 727 641 726C649 726 661 725 669 724C721 720 736 719 753 718C761 717 774 716 781 716C789 715 802 714 810 714C818 713 829 712 835 712C870 709 864 711 891 692C941 659 950 651 950 646C950 645 950 645 950 645C950 642 942 631 940 629C939 629 938 629 936 629C933 629 928 629 921 630Z"/><path fill="var(--accent)" d="M516 162C499 166 490 179 490 194C490 197 490 203 492 207C494 212 499 218 512 229C531 242 557 272 570 294C583 313 587 319 594 333C600 341 605 350 605 352C607 354 611 360 613 365C617 371 622 380 626 388C630 395 635 406 637 412C660 451 661 455 667 472C673 488 676 494 684 501C697 514 714 520 729 520C760 520 792 496 790 462C790 451 790 451 783 427C779 419 775 406 773 401C770 391 764 373 758 361C757 356 742 333 740 328C738 326 736 322 734 320C732 317 721 302 712 292C701 279 674 253 658 240C641 225 605 203 587 192C583 188 577 186 576 184C551 167 536 160 523 160C522 160 518 160 516 162Z"/></svg><!--/mark--><b class="spec">一粟</b><span>Yisu</span></a>
@@ -231,7 +238,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   <section class="hero" id="hero">
     <div style="min-width:0">
       <div class="intro">
-        <p>三套手寫的開源中文字型：印泥、畫沙、漏痕。六千多個常用字，一筆一劃重新寫過。</p>
+        <p>三套手寫的開源中文字型：印泥、畫沙、漏痕。六千八百多個常用字，一筆一劃重新寫過。</p>
         <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">下載字型</a><a href="#pens" data-to="pens">看樣張</a></div>
       </div>
       <div class="sky" aria-hidden="true"><div class="moon"></div><p>月出於東山之上，徘徊於斗牛之間。</p></div>
@@ -242,7 +249,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
       <noscript><p class="lead" style="margin-top:14px">書卷和筆順要開啟 JavaScript 才會寫出來。字型本身在下面的「三筆」，全文在「讀全文」。</p></noscript>
       <div class="under">
         <div class="ctl">
-          <button id="play" aria-pressed="true">暫停</button>
+          <button id="play" data-on="true">暫停</button>
           <span class="seg" role="group" aria-label="換筆">
             <button id="pen-clay" data-pen="clay" aria-pressed="false">印泥</button><button id="pen-sand" data-pen="sand" aria-pressed="true">畫沙</button><button id="pen-rain" data-pen="rain" aria-pressed="false">漏痕</button>
           </span>
@@ -323,7 +330,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   </div>
 
   <h2 id="lib">字庫</h2>
-  <p class="lead">六千一百一十五個常用字，繁體、簡體和注音。點一個字，或自己寫一個，看它一筆一筆寫出來。</p>
+  <p class="lead">六千八百多個常用字，繁體、簡體和注音。點一個字，或自己寫一個，看它一筆一筆寫出來。</p>
   <form class="ask" id="ask"><label for="ask-in">想看哪個字</label><input id="ask-in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="ask-msg"><button type="submit">寫</button><output id="ask-msg"></output></form>
   <div class="lib">
     <div class="cells" id="cells" role="group" aria-label="選一個字" data-spec="永和九年歲在暮春之初會于山陰蘭亭群賢畢至少長咸集崇峻茂林脩竹清流激湍"></div>
@@ -397,7 +404,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   <div class="cine-caption" aria-hidden="true"><canvas id="cine-sub"></canvas></div>
   <div class="cine-end ctl" id="cine-end" hidden><button id="cine-again">再看一遍</button></div>
   <div class="cine-ctl ctl">
-    <button id="cine-play" aria-pressed="true">暫停</button>
+    <button id="cine-play" data-on="true">暫停</button>
     <span class="seg" role="group" aria-label="筆">
       <button id="cine-clay" data-pen="clay" aria-pressed="false">印泥</button><button id="cine-sand" data-pen="sand" aria-pressed="true">畫沙</button><button id="cine-rain" data-pen="rain" aria-pressed="false">漏痕</button>
     </span>
@@ -581,7 +588,7 @@ class Writer {
       const x0 = this.W - o.pad - this.cols * (o.cell + o.gap) - o.gap - c;
       lines.forEach((line, k) => [...line].forEach((ch, r) => this.items.push({ ch, cell: c, row: r, x: x0 - k * pitch, y: o.pad + o.cell * 0.4 + r * c, tail: true })));
       const last = this.items[this.items.length - 1], s = o.cell * 1.1, foot = this.H - (o.hang || 0) - o.pad - o.cell * 2.3;
-      const under = lines.length === 1 || last.y + c * 1.5 <= foot;
+      const under = last.y + c * 1.5 <= foot;   // under only where it clears the last character; beside it otherwise
       this.items.push({ seal: true, cell: Math.round(s), x: under ? last.x - (s - c) / 2 : last.x - s - c * 0.4, y: under ? Math.min(last.y + c * 1.5, foot) : foot, row: 1 });
     }
   }
@@ -668,7 +675,7 @@ const ticks = new Set();
 let last = performance.now();
 /* A writer whose canvas is off the screen waits, unless something (the narration) needs it. */
 function frame(now) {
-  const dt = Math.min(60, now - last); last = now;
+  const dt = Math.min(st.read ? 250 : 60, now - last); last = now;   // with the voice on, a slow frame must not lose the writing's time
   for (const w of writers) if (w.shown !== false || w.o.always && w.o.always()) w.step(dt);
   for (const f of ticks) f(dt);
   requestAnimationFrame(frame);
@@ -714,21 +721,27 @@ const seen = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
 }, { threshold: [0, 0.4] }) : null;
 
 /* ---------- sound: a recorded reading, a sentence at a time, and a piece of music ---------- */
-const vo = { el: new Audio(), k: -1, live: false, until: 0, dur: 0, t0: 0, deadline: 0, times: null };
+const vo = { el: new Audio(), k: -1, live: false, started: false, until: 0, dur: 0, t0: 0, deadline: 0, times: null };
 vo.el.preload = 'auto';
 vo.el.addEventListener('ended', () => { vo.live = false; vo.until = performance.now() + 650; });      // a breath between sentences
+// The writing of a sentence starts when its clip is heard, not when it is asked for: on a first
+// visit a clip takes a moment to come.
+vo.el.addEventListener('playing', () => { if (vo.live && !vo.started) { vo.started = true; vo.t0 = performance.now(); vo.deadline = vo.t0 + vo.dur * 1000 + 5000; } });
 vo.el.addEventListener('error', () => { if (vo.live) { vo.live = false; $('note').textContent = '朗讀沒有載入。'; } });
 fetch('audio/vo.json?2').then(r => r.ok ? r.json() : null).then(d => { vo.times = d; }, () => {});
 vo.busy = () => { if (vo.live && performance.now() > vo.deadline) vo.live = false; return vo.live || performance.now() < vo.until; };
 vo.say = k => {
   const times = vo.times && vo.times[st.piece];
   vo.k = k; vo.dur = (times && times[k]) || 6; vo.t0 = performance.now(); vo.deadline = vo.t0 + vo.dur * 1000 + 5000; vo.live = true;
-  vo.el.src = `audio/vo/${st.piece}-${String(k).padStart(2, '0')}.mp3`;
+  vo.started = false; vo.el.src = vo.url(k);
   const p = vo.el.play(); if (p) p.catch(() => { vo.live = false; });
+  if (times && k + 1 < times.length) fetch(vo.url(k + 1)).catch(() => {});   // the next one, into the cache while this one plays
 };
+// The clip's length is in its address: a new take of a sentence is fetched anew, not taken from the cache.
+vo.url = k => { const t = vo.times && vo.times[st.piece]; return `audio/vo/${st.piece}-${String(k).padStart(2, '0')}.mp3` + (t && t[k] ? `?${t[k]}` : ''); };
 vo.stop = () => { vo.el.pause(); vo.live = false; vo.k = -1; vo.until = 0; };
 vo.prime = () => {                      // inside a click, so that clips may start later without one
-  vo.el.muted = true; vo.el.src = `audio/vo/${st.piece}-00.mp3`;
+  vo.el.muted = true; vo.el.src = vo.url(0);
   const done = () => { if (!vo.live) vo.el.pause(); vo.el.muted = false; }, p = vo.el.play();
   if (p) p.then(done, done); else done();
 };
@@ -767,9 +780,10 @@ function progress(w) {
 function gate(w, it, i) {
   if (!st.read || i >= w.main) return true;
   const k = W.sent.of[i];
-  if (W.sent.starts[k] !== i || vo.k === k) return true;
+  if (W.sent.starts[k] !== i) return true;
+  if (vo.k === k) return vo.started || !vo.live;     // its clip has begun, or will not
   if (vo.busy()) return false;
-  vo.say(k); return true;
+  vo.say(k); return false;
 }
 
 function init(keep) {
@@ -782,7 +796,7 @@ function init(keep) {
   const cell = narrow() ? 32 : 48;
   $('roll').setAttribute('aria-label', piece.label);
   W.roll = new Writer($('roll'), {
-    text: piece.text, tail: piece.tail, pen: st.pen, cell, gap: Math.round(cell * 0.3), rows: 10, pad: Math.round(cell * 0.5), pre: had === null ? (st.read ? 0 : 20) : had,
+    text: piece.text, tail: piece.tail, pen: st.pen, cell, gap: Math.round(cell * 0.3), rows: 10, pad: Math.round(cell * 0.5), pre: had === null ? (st.read ? 0 : 20) : had, opening: had === null ? (st.read ? 0 : 20) : W.roll.o.opening,
     color: ink, sealColor: css('--seal'), rate: st.rate, minW: scroller.clientWidth, always: () => st.read,
     gate,
     onStroke: (kind, it, si, n, stroke) => {
@@ -883,7 +897,7 @@ function sync(force) {
   if (st.piece !== was && !force) playing(true);
   init(st.piece === was); music();
 }
-function playing(on) { st.playing = on; $('play').setAttribute('aria-pressed', on); $('play').textContent = on ? '暫停' : (W.roll && W.roll.done ? '再寫一遍' : '繼續'); }
+function playing(on) { st.playing = on; $('play').dataset.on = on; $('play').textContent = on ? '暫停' : (W.roll && W.roll.done ? '再寫一遍' : '繼續'); }
 function restart(n) { const sc = $('scroll'); vo.stop(); st.asked = true; playing(true); W.roll.reset(n); W.roll.o.rate = st.rate; W.roll.on = true; if (!n) sc.scrollLeft = sc.scrollWidth; }
 /* ---------- the viewing mode: the scroll alone, large, the camera following the pen ----------
    A title written in the middle of the screen; then the text, six to a column (eight on an
@@ -1008,7 +1022,7 @@ function cineTick(dt) {
   cineCamera(dt);
   if (cine.phase === 'roll' && cine.playing && performance.now() - cine.moved > 2500) $('cine').classList.add('idle');
 }
-function cinePlay(on) { cine.playing = on; $('cine-play').setAttribute('aria-pressed', on); $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
+function cinePlay(on) { cine.playing = on; $('cine-play').dataset.on = on; $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
 function cineOpen() {
   if (cine.on) return;
   const box = $('cine');
@@ -1085,7 +1099,8 @@ function wire() {
     st.read = on; for (const id of ['slow', 'mid', 'fast']) $(id).disabled = on;
     if (!on) { vo.stop(); W.roll.o.rate = st.rate; return; }
     // from the top of the sentence being written; the first clip starts in this click, which is what lets it play
-    const w = W.roll, from = w.done || w.i >= w.main ? 0 : W.sent.starts[W.sent.of[w.i]];
+    const w = W.roll; let from = w.done || w.i >= w.main ? 0 : W.sent.starts[W.sent.of[w.i]];
+    if (from <= (w.o.opening || 0)) from = 0;    // the opening written before the reading was on has not been heard
     restart(from); vo.say(W.sent.of[from]);
   });
   seg(['slow', 'mid', 'fast'], b => { st.rate = +b.dataset.rate; W.roll.o.rate = st.rate; });
@@ -1100,7 +1115,7 @@ function wire() {
   $('ask').addEventListener('submit', e => {
     e.preventDefault(); const ch = [...$('ask-in').value.trim()].pop(); if (!ch) return;
     $('ask-msg').textContent = ''; fullFonts();
-    loadAll().then(() => { if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千多個常用字，一輪一輪在補。`; },
+    loadAll().then(() => { if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
       () => { whole = null; $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
   });
   // the tester: the fonts themselves
@@ -1122,7 +1137,7 @@ function wire() {
   for (const ev of ['pointerup', 'pointercancel']) sc.addEventListener(ev, () => { drag = null; sc.classList.remove('drag'); });
   for (const ev of ['pointerdown', 'wheel', 'keydown', 'touchmove']) sc.addEventListener(ev, () => { st.touched = performance.now(); }, { passive: true });
   for (const a of document.querySelectorAll('a[data-to]')) a.addEventListener('click', e => { e.preventDefault(); $(a.dataset.to).scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); });
-  document.addEventListener('visibilitychange', () => { music(); if (st.playing) vo.hold(document.hidden); });
+  document.addEventListener('visibilitychange', () => { music(); if (cine.on ? cine.playing : st.playing) vo.hold(document.hidden); });
   new MutationObserver(() => sync()).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => sync());
   let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (window.innerWidth !== st.width) { cache.clear(); init(true); } else { rain.w = window.innerWidth; rain.h = window.innerHeight; rain.ctx = fit($('rain'), rain.w, rain.h); rain.top = fit($('sparks'), rain.w, rain.h); } }, 300); });
