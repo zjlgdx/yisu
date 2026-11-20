@@ -22,7 +22,7 @@
 <link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="fonts/huasha-400.woff2?v=8c80965a" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/huasha-400.woff2?v=0e2b9c90" as="font" type="font/woff2" crossorigin>
 <!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
      browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
 <link rel="stylesheet" href="fonts/faces.css?2">
@@ -382,10 +382,10 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
 
   <h2 id="get">下載</h2>
   <dl class="facts">
-    <dt>字數</dt><dd>6,804 個漢字（繁體與簡體）、注音符號、拉丁字母、數字和標點；印泥另有畫框線和終端機用的符號</dd>
+    <dt>字數</dt><dd>6,929 個漢字（繁體與簡體）、注音符號、拉丁字母、數字和標點；印泥另有畫框線和終端機用的符號</dd>
     <dt>粗細</dt><dd>每套 Regular 和 Bold 兩種，共六個字型</dd>
     <dt>格式</dt><dd>OTF（安裝用）和 WOFF2（網頁用）</dd>
-    <dt>版本</dt><dd>0.810，Big5 常用字已經畫齊，現在一輪一輪精修字形</dd>
+    <dt>版本</dt><dd>0.840，Big5 常用字和 GB 2312 一級字都已畫齊，現在一輪一輪精修字形</dd>
     <dt>授權</dt><dd>SIL Open Font License 1.1，個人和商業都可以免費使用、修改和再散布</dd>
   </dl>
   <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">下載字型</a><a href="https://github.com/zjlgdx/yisu-fonts" target="_blank" rel="noopener">原始碼</a></div>
@@ -404,7 +404,7 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
       <li>macOS：下載 <code>.otf</code>，點兩下打開，按「安裝」。</li>
       <li>Windows：在 <code>.otf</code> 上按右鍵，選「安裝」。</li>
       <li>Linux：放進 <code>~/.local/share/fonts</code>，再執行 <code>fc-cache -f</code>。</li>
-      <li>網頁：用 <code>.woff2</code>，在 CSS 裡寫 <code>@font-face { font-family: "Yisu"; src: url(YisuHuasha-Regular.woff2) format("woff2"); }</code>。</li>
+      <li>網頁：完整的 <code>.woff2</code> 每個有 6 到 11 MB，直接放上網頁，要先下載好幾 MB 才看得到字。先把頁面用到的字切出來：裝好 <code>pip install fonttools brotli</code>，執行 <code>pyftsubset YisuHuasha-Regular.otf --text-file=page.txt --flavor=woff2 --output-file=yisu-huasha.woff2</code>（<code>page.txt</code> 放頁面上的文字），再在 CSS 裡寫 <code>@font-face { font-family: "Yisu Huasha"; src: url(yisu-huasha.woff2) format("woff2"); }</code>。文字常變的網站，可以像這一頁一樣，把字型切成幾十個小檔，各配一段 <code>unicode-range</code>，瀏覽器就只下載用到的那幾個。</li>
     </ul>
   </details>
   <p class="from" style="margin-top:14px">檔名是 YisuYinni（印泥）、YisuHuasha（畫沙）和 YisuLouhen（漏痕）。0.730 以前的版本叫 Pinboard Typewriter、Ballpoint 和 Marker。</p>
@@ -412,8 +412,9 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
   <h2 id="en" lang="en" style="letter-spacing:.12em">In English</h2>
   <div class="en" lang="en">
     <p>Yisu (一粟, “one grain of millet”) is a set of three open-source Chinese typefaces. Each one is written by hand, a stroke at a time, with a different pen: Yinni is a typewriter’s Fangsong, Huasha is a ballpoint’s Kaishu, and Louhen is a chisel-tip marker.</p>
-    <p>Each has 6,804 Chinese characters, Traditional and Simplified, with Zhuyin, Latin letters and figures, in Regular and Bold. Nothing is traced or measured from another font. The scroll at the top of this page writes the fonts’ own strokes in order; the samples under 三筆 are the fonts themselves.</p>
+    <p>Each has 6,929 Chinese characters, Traditional and Simplified, with Zhuyin, Latin letters and figures, in Regular and Bold. Nothing is traced or measured from another font. The scroll at the top of this page writes the fonts’ own strokes in order; the samples under 三筆 are the fonts themselves.</p>
     <p>The name is from Su Shi’s <i>Ode on the Red Cliff</i>: a person between heaven and earth is one grain of millet in the sea. The fonts are free under the SIL Open Font License 1.1.</p>
+    <p>Install the <code>.otf</code> files. For a web page, subset a <code>.woff2</code> to the characters the page uses first (each full one is 6–11 MB): <code>pyftsubset YisuHuasha-Regular.otf --text-file=page.txt --flavor=woff2</code>, from fontTools, or split it by <code>unicode-range</code> as this page does.</p>
     <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">Download</a><a href="https://github.com/zjlgdx/yisu-fonts" target="_blank" rel="noopener">Source</a></div>
   </div>
 
@@ -983,9 +984,9 @@ function playing(on) { st.playing = on; $('play').dataset.on = on; $('play').tex
 function restart(n) { const sc = $('scroll'); vo.stop(); st.asked = true; playing(true); W.roll.reset(n); W.roll.o.rate = st.rate; W.roll.on = true; if (!n) sc.scrollLeft = sc.scrollWidth; }
 /* ---------- the viewing mode: the scroll alone, large, the camera following the pen ----------
    A title written in the middle of the screen; then the text, six to a column (eight on an
-   upright screen), with the sentence being written as a caption; then the whole scroll, end to
+   upright screen), with the clause being read as a caption; then the whole scroll, end to
    end. It reads aloud and plays the music unless the reader turns them off there. */
-const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, shot: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null };
+const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, shot: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null, cap: '' };
 const CINE_BAND = 8;                    // the mount above and below the paper, as the styles draw it
 const cineLater = (fn, ms) => { clearTimeout(cine.timer); cine.timer = setTimeout(fn, ms); };
 function cinePhase(p) {                 // title, roll, wide (pulling back), end
@@ -1006,13 +1007,28 @@ function cineRuns(w) {
   if (a >= 0) runs.push([a, w.main]);
   return { runs, at };
 }
-/* The caption: the run being written, in the Typewriter's hand; what is written is bright. */
+/* The run the voice is saying: in the clip playing, the clause whose mark (vo.json) it has
+   passed. -1 when no clip is being heard, or its clauses aren't known. */
+function cineHeard(w, c) {
+  const k = vo.k, marks = vo.times && vo.times.marks && vo.times.marks[st.piece] && vo.times.marks[st.piece][k];
+  if (!st.read || k < 0 || !vo.started || !marks) return -1;
+  const t = vo.el.currentTime || 0, end = W.sent.starts[k + 1] || w.main;
+  let j = 0; while (j < marks.length && t >= marks[j]) j++;
+  for (let i = W.sent.starts[k]; i < end; i++) if (W.sent.clause[i] === j && !PUNCT.includes(w.items[i].ch)) return c.at[i];
+  return -1;
+}
+/* The caption: the clause being read, in the Typewriter's hand; what is written is bright. With
+   the reading on it turns when the voice reaches the next clause, not when the pen does (the pen
+   is a little ahead or behind); without it, when the pen touches the next clause. */
 function cineCaption(w) {
-  const cv = $('cine-sub');
-  if (w.i >= w.main) { fit(cv, 1, 1); return; }
-  // Until the pen touches a new clause, the one just written stays: the voice is still on it.
-  const c = w.clauses || (w.clauses = cineRuns(w)), fresh = w.i > 0 && c.at[w.i] !== c.at[w.i - 1] && !w.s && !w.p;
-  const run = c.runs[c.at[fresh ? w.i - 1 : w.i]], n = run[1] - run[0];
+  const cv = $('cine-sub'), c = w.clauses || (w.clauses = cineRuns(w));
+  let r = cineHeard(w, c);
+  if (r < 0 && w.i < w.main) r = c.at[w.i > 0 && c.at[w.i] !== c.at[w.i - 1] && !w.s && !w.p ? w.i - 1 : w.i];
+  const key = `${r} ${w.i} ${cine.w} ${cine.h}`;
+  if (key === cine.cap) return;
+  cine.cap = key;
+  if (r < 0) { fit(cv, 1, 1); return; }
+  const run = c.runs[r], n = run[1] - run[0];
   const size = Math.max(14, Math.min(Math.round(cine.h * 0.056), Math.floor(cine.w * 0.9 / n)));
   const ctx = fit(cv, n * size, size); ctx.fillStyle = '#ece8da';
   for (let i = run[0]; i < run[1]; i++) { ctx.globalAlpha = i < w.i ? 1 : 0.3; glyph(ctx, w.items[i].ch, 'clay', 0, (i - run[0]) * size, 0, size); }
@@ -1028,7 +1044,7 @@ function cineLayout(keep) {
   const had = keep && cine.roll ? cine.roll.i : 0;
   if (!keep) { clearTimeout(cine.timer); cine.phase = 'title'; cine.shot = 0; box.classList.remove('settled'); $('cine-far').style.transition = ''; vo.stop(); }
   if (cine.roll) { writers.delete(cine.roll); writers.delete(cine.card); }
-  cine.piece = st.piece; cine.w = box.clientWidth; cine.h = box.clientHeight;
+  cine.piece = st.piece; cine.cap = ''; cine.w = box.clientWidth; cine.h = box.clientHeight;
   cine.tone = { ink: look.getPropertyValue('--cine-ink').trim(), soft: look.getPropertyValue('--cine-soft').trim() };
   for (const b of $('cine-label').children) b.hidden = b.dataset.piece !== st.piece;
   const room = view.clientHeight - CINE_BAND * 2, rows = cine.w > cine.h * 1.2 ? 6 : 8;
@@ -1105,6 +1121,7 @@ function cineWake() { cine.moved = performance.now(); $('cine').classList.remove
 function cineTick(dt) {
   if (!cine.on) return;
   cineCamera(dt);
+  if (cine.phase === 'roll') cineCaption(cine.roll);        // the voice moves on between strokes
   if (cine.phase === 'roll' && cine.playing && performance.now() - cine.moved > 2500) $('cine').classList.add('idle');
 }
 function cinePlay(on) { cine.playing = on; $('cine-play').dataset.on = on; $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
@@ -1197,11 +1214,20 @@ function wire() {
     root.dataset.theme = $(id).dataset.set; try { localStorage.setItem('yisu-theme', root.dataset.theme); } catch (e) { /* the choice lasts this visit only */ }
     sync();
   });
+  let askSeq = 0;
   $('ask').addEventListener('submit', e => {
     e.preventDefault(); const ch = [...$('ask-in').value.trim()].pop(); if (!ch) return;
+    const seq = ++askSeq;
     $('ask-msg').textContent = ''; fullFonts();
-    loadStroke(ch).then(() => { if (/\p{Script=Han}/u.test(ch)) ev(S[ch] ? 'char' : 'missing', ch); if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
-      () => { $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
+    loadStroke(ch).then(() => {
+      if (seq !== askSeq) return;
+      if (/\p{Script=Han}/u.test(ch)) ev(S[ch] ? 'char' : 'missing', ch);
+      if (S[ch] && ch !== '') showChar(ch);
+      else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千九百多個常用字，一輪一輪在補。`;
+    }, () => {
+      if (seq !== askSeq) return;
+      $('ask-msg').textContent = '字庫沒有載入，請再試一次。';
+    });
   });
   // the tester: the fonts themselves
   const box = $('try-in'), tried = { pen: 'sand', weight: 400 };

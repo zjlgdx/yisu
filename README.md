@@ -40,7 +40,7 @@ The page writes a classical text a stroke at a time, in vertical columns from ri
 - **朗讀 (read aloud).** A recorded voice reads each sentence while it is written, and the writing keeps time with the voice: a sentence starts when its clip is heard, and its pace follows the clip's length.
 - **觀影 (watch).** The scroll alone on a dark screen, large, with the reading and the music:
   - First a title.
-  - Then the text, six characters to a column (eight on an upright screen). The camera follows the pen, and the clause being written shows as a caption.
+  - Then the text, six characters to a column (eight on an upright screen). The camera follows the pen, and the clause being read shows as a caption, turning as the voice reaches the next.
   - Then the whole scroll, end to end. If it is too long to take in at once, it is pulled back only as far as it still reads as writing, and the camera travels along it to where it began.
 - **字庫 (the library).** Any of the fonts' characters, written large in stroke order, with the three families side by side.
 - **試寫 (try it).** A box to type in, set in any family and weight, across or down. The whole fonts arrive in slices of 300 characters as they are needed.
