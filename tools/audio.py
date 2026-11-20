@@ -3,7 +3,8 @@
     MINIMAX_API_KEY=... python3 -I tools/audio.py
 
 One clip per sentence of the texts in public/index.html, in public/audio/vo/,
-and their lengths in public/audio/vo.json. The page paces its writing to these
+and their lengths in public/audio/vo.json, with when each clause in them begins
+(under "marks"). The page paces its writing to these
 lengths, so run this again whenever a text changes. (The music is tools/music.py:
 MiniMax's music API no longer takes new accounts.)
 
@@ -56,6 +57,11 @@ TONES_MORE = {'tengwang': [
 # The 神龍本's forms, said as the characters they stand for.
 SAY = [('脩', '修'), ('暎', '映'), ('俛', '俯'), ('攬', '覽'), ('峻領', '峻嶺'), ('陳迹', '陳跡'), ('「', ''), ('」', '')]
 ENDS = '。！？；'
+# A closing quotation mark stays with the sentence it closes: 「…死生亦大矣。」豈不痛哉！
+CLOSE = '」』'
+# Asked for alone, a sentence of a few characters comes back read in a hurry, half as fast
+# again as the rest. Those are asked for slower.
+SHORT, SHORT_SPEED = 4, 0.55
 PIECES = ('lanting', 'chibi', 'tengwang')
 # Which reading of a sentence is used, where the first came back from tools/hear.py with a
 # syllable in doubt: the clip's name and the take that transcribed cleanly. (lanting-03's 湍
@@ -120,6 +126,9 @@ def lufs(path):
 def sentences(text):
     out, cur = [], ''
     for ch in text:
+        if ch in CLOSE and not cur and out:
+            out[-1] += ch
+            continue
         cur += ch
         if ch in ENDS:
             out.append(cur)
@@ -127,13 +136,30 @@ def sentences(text):
     return out + ([cur] if cur else [])
 
 
+def breaths(path, n):
+    """When each clause after the first begins in a clip: the ends of its n longest pauses, in
+    order. The page writes each clause by these, so the caption and the pen keep with the voice.
+    None when the clip doesn't show n clear pauses."""
+    if not n:
+        return []
+    out = subprocess.run(['ffmpeg', '-nostats', '-i', str(path), '-af', 'silencedetect=noise=-40dB:d=0.2', '-f', 'null', '-'],
+                         capture_output=True, text=True).stderr
+    ends = [float(x) for x in re.findall(r'silence_end: ([\d.]+)', out)]
+    lens = [float(x) for x in re.findall(r'silence_duration: ([\d.]+)', out)]
+    gaps = sorted(zip(lens, ends), reverse=True)[:n]
+    return sorted(round(e, 2) for _, e in gaps) if len(gaps) == n else None
+
+
 def voice():
     page = (SITE / 'public' / 'index.html').read_text(encoding='utf-8')
     (AUDIO / 'vo').mkdir(parents=True, exist_ok=True)
-    lengths = {}
-    trim = 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse'
+    lengths, marks = {}, {}
+    # Silence off both ends, but the last syllable's fall kept (a tenth of a second below the
+    # threshold), then faded, so no clip stops in the middle of a sound.
+    trim = ('silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,areverse,'
+            'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.1,areverse')
     for piece in PIECES:
-        lengths[piece] = []
+        lengths[piece], marks[piece] = [], []
         for i, sentence in enumerate(sentences(re.sub(r'<[^>]+>|\s+', '', re.search(rf'<p id="text-{piece}"[^>]*>(.*?)</p>', page, re.S).group(1)))):
             said = sentence
             for a, b in SAY:
@@ -141,20 +167,24 @@ def voice():
             said = re.sub(r'([，、：])(?=.)', rf'\1<#{BREATH}#>', said)
             raw = ask('/v1/t2a_v2', {
                 'model': VOICE['model'], 'text': said, 'stream': False, 'language_boost': 'Chinese',
-                'voice_setting': {'voice_id': VOICE['voice_id'], 'speed': VOICE['speed'], 'vol': 1, 'pitch': 0, 'emotion': VOICE['emotion']},
+                'voice_setting': {'voice_id': VOICE['voice_id'], 'vol': 1, 'pitch': 0, 'emotion': VOICE['emotion'],
+                                  'speed': SHORT_SPEED if len(re.findall(r'[\u3400-\u9fff]', said)) <= SHORT else VOICE['speed']},
                 'pronunciation_dict': {'tone': TONES_MORE.get(piece, TONES) + PINS.get(f'{piece}-{i:02d}', [])},
                 'audio_setting': {'sample_rate': 32000, 'bitrate': 128000, 'format': 'mp3', 'channel': 1}}, 90, TAKES.get(f'{piece}-{i:02d}', 1))
             # Each sentence is a separate take, so its silences and loudness drift: trim, then level.
             out = AUDIO / 'vo' / f'{piece}-{i:02d}.mp3'
             wav = CACHE / 'trimmed.wav'
             ffmpeg('-i', str(raw), '-af', trim, str(wav))
-            gain = max(-12, min(12, -19 - lufs(wav)))
-            ffmpeg('-i', str(wav), '-af', f'volume={gain:.2f}dB,alimiter=limit=0.89', '-ar', '32000', '-ac', '1', '-b:a', '64k', str(out))
+            gain, d = max(-12, min(12, -19 - lufs(wav))), seconds(wav)
+            ffmpeg('-i', str(wav), '-af', f'volume={gain:.2f}dB,alimiter=limit=0.89,afade=t=in:d=0.01,afade=t=out:st={d - 0.08:.3f}:d=0.08',
+                   '-ar', '32000', '-ac', '1', '-b:a', '64k', str(out))
             lengths[piece].append(round(seconds(out), 2))
+            marks[piece].append(breaths(out, said.count('<#')))
             print(f'{out.name} {lengths[piece][-1]:5.2f}s  {said}')
-    (AUDIO / 'vo.json').write_text(json.dumps(lengths, separators=(',', ':')) + '\n')
+    (AUDIO / 'vo.json').write_text(json.dumps({**lengths, 'marks': marks}, separators=(',', ':')) + '\n')
     for piece, v in lengths.items():
-        print(f'{piece}: {len(v)} sentences, {sum(v):.0f} s')
+        found = sum(m is not None for m in marks[piece])
+        print(f'{piece}: {len(v)} sentences, {sum(v):.0f} s, the clauses found in {found}')
 
 
 if __name__ == '__main__':

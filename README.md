@@ -116,9 +116,9 @@ $FONTS/.venv/bin/python tools/music.py
 
 The site counts visits and what readers do, without cookies and without keeping who anyone is:
 
-- **Visits:** [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/). Its beacon is the last script in `index.html`; the token in it only names the site to count, and the numbers are in the Cloudflare dashboard under Web Analytics.
+- **Visits:** [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/). The page's script adds its beacon, on the same terms as the events below; the token in it only names the site to count. The numbers are in the Cloudflare dashboard under Web Analytics.
 - **What readers do:** the page posts a name and a short value to `/e` (朗讀 or the music turned on, a text or a family picked, the scroll written to its end, 觀影 opened and watched through, a character looked up in 字庫, the box to type in used). `src/worker.js` takes only the names and values it knows, and writes each to [Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) with the reader's country and whether it came from a phone. It keeps no IP address, no user agent and nothing typed into the box to type in.
-- Nothing is sent from a copy run anywhere but the site and `wrangler dev`, or from a browser that sends Global Privacy Control or Do Not Track.
+- Nothing is sent from a copy run anywhere but the site (events also from `wrangler dev`), or from a browser that sends Global Privacy Control or Do Not Track.
 
 ```
 CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... python3 -I tools/events.py 30
