@@ -18,6 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#efeee9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme: dark)">
+<script>(function(){try{var t=localStorage.getItem('yisu-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;return;}}catch(e){}if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.dataset.theme='dark';})();</script>
 <link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -40,7 +41,6 @@
   --text: "Yisu Huasha", "Songti TC", "Noto Serif TC", "PMingLiU", serif;
   --pen-font: "Yisu Huasha";
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --edge: #5f6a80; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
 :root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --edge: #5f6a80; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
 html, body { height: auto; }
 body { margin: 0; background-color: var(--paper); background-image: var(--paper-image); background-size: var(--paper-size); background-position: 0 0, 3px 5px;
@@ -114,9 +114,9 @@ nav .links a:hover { border-color: var(--accent); color: var(--ink); }
 .seal { display: inline-block; background: var(--seal); color: #f6efe6; padding: 6px 5px; border-radius: 5px; font: 700 28px/1.05 "Yisu Louhen", var(--text); writing-mode: vertical-rl; }
 
 h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accent); margin: 60px 0 6px; scroll-margin-top: 16px; }
-.lead { max-width: 34em; color: var(--soft); margin: 0 0 20px; }
+.lead { max-width: 34em; color: var(--soft); margin: 0 0 20px; letter-spacing: .02em; }
 .pair { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; margin-top: 16px; }
-.pair p { margin: 0 0 12px; max-width: 36em; }
+.pair p { margin: 0 0 12px; max-width: 36em; letter-spacing: .02em; }
 .pair .from, .from { color: var(--soft); font-size: 15px; }
 .vert { writing-mode: vertical-rl; font-size: 54px; line-height: 1.1; margin: 0; letter-spacing: .04em; }
 .pens { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
@@ -153,8 +153,12 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .try { border: 1px solid var(--edge); background: var(--panel); margin-top: 12px; padding: 16px 20px; min-height: 2.6em; max-height: 70vh; overflow: auto;
   font: 400 44px/1.5 "Yisu Huasha", var(--text); white-space: pre-wrap; overflow-wrap: anywhere; }
 .try.v { writing-mode: vertical-rl; height: 8.4em; max-height: none; width: 100%; box-sizing: border-box; }   /* its width would grow with the text */
-.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 22px; margin: 4px 0 18px; max-width: 40em; }
+.try-status { font-size: 14px; color: var(--soft); margin-left: auto; min-height: 1.4em; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 22px; margin: 4px 0 18px; max-width: 40em; letter-spacing: .02em; }
 .facts dt { color: var(--soft); white-space: nowrap; } .facts dd { margin: 0; }
+.quick-dl { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 15px; color: var(--soft); }
+.quick-dl a { text-decoration: none; border-bottom: 1px solid var(--line); padding: 2px 0; }
+.quick-dl a:hover { color: var(--ink); border-color: var(--accent); }
 .how { margin-top: 18px; max-width: 40em; }
 .how summary { cursor: pointer; width: fit-content; padding: 8px 0; }
 .how ul { margin: 4px 0 0; padding-left: 1.2em; color: var(--soft); font-size: 16px; }
@@ -359,9 +363,13 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
     <span class="seg" role="group" aria-label="排向">
       <button id="try-h" data-v="0" aria-pressed="true">橫排</button><button id="try-v" data-v="1" aria-pressed="false">直排</button>
     </span>
+    <span class="seg" role="group" aria-label="字形標準">
+      <button id="try-tw" data-lang="zh-Hant" aria-pressed="true">繁體</button><button id="try-cn" data-lang="zh-Hans" aria-pressed="false">簡體</button>
+    </span>
     <label>字級<input type="range" id="try-size" min="16" max="120" value="44"></label>
+    <span class="try-status" id="try-status" aria-live="polite"></span>
   </div>
-  <div class="try spec" id="try-in" contenteditable="true" role="textbox" aria-multiline="true" aria-label="試寫" spellcheck="false">天地玄黃，宇宙洪荒。Yisu 一粟 0123456789</div>
+  <div class="try spec" id="try-in" lang="zh-Hant" contenteditable="true" role="textbox" aria-multiline="true" aria-label="試寫" spellcheck="false">天地玄黃，宇宙洪荒。Yisu 一粟 0123456789</div>
 
   <h2 id="creed">臨而不摹</h2>
   <div class="pair">
@@ -381,6 +389,15 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
     <dt>授權</dt><dd>SIL Open Font License 1.1，個人和商業都可以免費使用、修改和再散布</dd>
   </dl>
   <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">下載字型</a><a href="https://github.com/zjlgdx/yisu-fonts" target="_blank" rel="noopener">原始碼</a></div>
+  <div class="quick-dl" aria-label="直連下載最新 OTF">
+    <span>直連最新 OTF：</span>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuYinni-Regular.otf">印泥 Regular</a>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuYinni-Bold.otf">印泥 Bold</a>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuHuasha-Regular.otf">畫沙 Regular</a>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuHuasha-Bold.otf">畫沙 Bold</a>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuLouhen-Regular.otf">漏痕 Regular</a>
+    <a href="https://github.com/zjlgdx/yisu-fonts/releases/latest/download/YisuLouhen-Bold.otf">漏痕 Bold</a>
+  </div>
   <details class="how">
     <summary>怎麼安裝</summary>
     <ul>
@@ -886,8 +903,8 @@ function init(keep) {
   // the sky: grains of millet falling behind the page, more of them at night
   const r = rng(27); rain.w = window.innerWidth; rain.h = window.innerHeight;
   rain.ctx = fit($('rain'), rain.w, rain.h); rain.top = fit($('sparks'), rain.w, rain.h);
-  rain.color = css('--grain'); rain.alpha = dark ? 1 : 0.75; rain.sparks = [];
-  rain.grains = Array.from({ length: Math.round(rain.w / (dark ? 16 : 56)) }, () => ({ x: r() * rain.w, y: r() * rain.h, v: 30 + r() * 70, a: r() * 6.28, s: (dark ? 1.2 : 2) + r() * 1.8, o: 0.15 + r() * 0.5 }));
+  rain.color = css('--grain'); rain.alpha = dark ? 0.68 : 0.75; rain.sparks = [];
+  rain.grains = Array.from({ length: Math.round(rain.w / (dark ? 26 : 56)) }, () => ({ x: r() * rain.w, y: r() * rain.h, v: 30 + r() * 70, a: r() * 6.28, s: (dark ? 1.2 : 2) + r() * 1.8, o: 0.15 + r() * 0.5 }));
   tick(0); if (!REDUCED) ticks.add(tick);
   if (cine.on) cineLayout(st.piece === cine.piece);
 }
@@ -896,24 +913,44 @@ function showChar(ch) {
   for (const s of $('three').querySelectorAll('i')) s.textContent = ch;
   $('big').setAttribute('aria-label', ch + ' 的筆順'); W.big.o.text = ch; W.big.build(); W.big.reset(REDUCED ? 1 : 0); W.big.on = !REDUCED;
 }
-/* Every other character the fonts have: its strokes are fetched the first time a reader asks
-   for one, and so are the fonts' own files, cut into slices by how common a character is. */
-let whole = null;
-const loadAll = () => whole || (whole = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'strokes-all.js?2'; s.onload = ok; s.onerror = no; document.head.append(s); }));
+/* Every other character the fonts have: its strokes are fetched in 32 small buckets on demand,
+   and so are the fonts' own files, cut into slices by how common a character is. */
+const strokeBuckets = new Map();
+const loadStroke = ch => {
+  if (S[ch]) return Promise.resolve();
+  const id = (ch.codePointAt(0) & 31).toString(16).padStart(2, '0');
+  if (strokeBuckets.has(id)) return strokeBuckets.get(id);
+  const p = fetch(`strokes/${id}.json?2`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => { Object.assign(S, data); })
+    .catch(err => { strokeBuckets.delete(id); throw err; });
+  strokeBuckets.set(id, p);
+  return p;
+};
 let full = null;
-const fullFonts = () => full || (full = fetch('fonts/full/index.json?2').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(m => {
-  const order = [...m.order], hex = a => a.map(c => 'U+' + c.codePointAt(0).toString(16)).join(','), cut = m.v ? '?v=' + m.v : '';     // which cut of the fonts these slices are
-  let rules = '';
-  for (const f of m.fonts) {
-    const skip = new Set(f.skip), face = `@font-face{font-family:"${f.family}";font-weight:${f.weight};font-display:swap;src:url(fonts/full/${f.file}-`;
-    for (let q = 0; q * m.size < order.length; q++) {
-      const part = order.slice(q * m.size, (q + 1) * m.size).filter(c => !skip.has(c));
-      if (part.length) rules += `${face}${String(q).padStart(2, '0')}.woff2${cut}) format("woff2");unicode-range:${hex(part)}}`;
+const setTryStatus = msg => { const el = $('try-status'); if (el) el.textContent = msg; };
+const fullFonts = () => {
+  if (full) return full;
+  setTryStatus('載入完整字庫中…');
+  full = fetch('fonts/full/index.json?2').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(m => {
+    const order = [...m.order], hex = a => a.map(c => 'U+' + c.codePointAt(0).toString(16)).join(','), cut = m.v ? '?v=' + m.v : '';     // which cut of the fonts these slices are
+    let rules = '';
+    for (const f of m.fonts) {
+      const skip = new Set(f.skip), face = `@font-face{font-family:"${f.family}";font-weight:${f.weight};font-display:swap;src:url(fonts/full/${f.file}-`;
+      for (let q = 0; q * m.size < order.length; q++) {
+        const part = order.slice(q * m.size, (q + 1) * m.size).filter(c => !skip.has(c));
+        if (part.length) rules += `${face}${String(q).padStart(2, '0')}.woff2${cut}) format("woff2");unicode-range:${hex(part)}}`;
+      }
+      if (f.other) rules += `${face}a.woff2${cut}) format("woff2");unicode-range:${f.other}}`;
     }
-    if (f.other) rules += `${face}a.woff2${cut}) format("woff2");unicode-range:${f.other}}`;
-  }
-  const s = document.createElement('style'); s.textContent = rules; document.head.append(s);
-}).catch(() => { full = null; }));
+    const s = document.createElement('style'); s.textContent = rules; document.head.append(s);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => setTryStatus(''));
+    } else {
+      setTryStatus('');
+    }
+  }).catch(() => { full = null; setTryStatus('完整字庫暫時無法載入'); });
+  return full;
+};
 function tick(dt) {
   const c = rain.ctx, t = rain.top; c.clearRect(0, 0, rain.w, rain.h); c.fillStyle = rain.color;
   for (const g of rain.grains) {
@@ -1163,17 +1200,31 @@ function wire() {
   $('ask').addEventListener('submit', e => {
     e.preventDefault(); const ch = [...$('ask-in').value.trim()].pop(); if (!ch) return;
     $('ask-msg').textContent = ''; fullFonts();
-    loadAll().then(() => { if (/\p{Script=Han}/u.test(ch)) ev(S[ch] ? 'char' : 'missing', ch); if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
-      () => { whole = null; $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
+    loadStroke(ch).then(() => { if (/\p{Script=Han}/u.test(ch)) ev(S[ch] ? 'char' : 'missing', ch); if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
+      () => { $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
   });
   // the tester: the fonts themselves
   const box = $('try-in'), tried = { pen: 'sand', weight: 400 };
   const dress = () => { box.style.fontFamily = `"${FONT[tried.pen]}", var(--text)`; box.style.fontWeight = tried.weight; };
-  seg(['try-clay', 'try-sand', 'try-rain'], b => { tried.pen = b.dataset.pen; dress(); });
-  seg(['try-regular', 'try-bold'], b => { tried.weight = +b.dataset.w; dress(); });
-  seg(['try-h', 'try-v'], b => box.classList.toggle('v', b.dataset.v === '1'));
+  seg(['try-clay', 'try-sand', 'try-rain'], b => { tried.pen = b.dataset.pen; dress(); fullFonts(); });
+  seg(['try-regular', 'try-bold'], b => { tried.weight = +b.dataset.w; dress(); fullFonts(); });
+  seg(['try-h', 'try-v'], b => { box.classList.toggle('v', b.dataset.v === '1'); fullFonts(); });
+  seg(['try-tw', 'try-cn'], b => { box.lang = b.dataset.lang; fullFonts(); });
   $('try-size').addEventListener('input', () => { box.style.fontSize = $('try-size').value + 'px'; });
   box.addEventListener('focus', () => { fullFonts(); ev('try'); }, { once: true });
+  box.addEventListener('input', () => {
+    fullFonts();
+    if (document.fonts && document.fonts.status === 'loading') {
+      setTryStatus('載入字形中…');
+      document.fonts.ready.then(() => setTryStatus(''));
+    }
+  });
+  if ('IntersectionObserver' in window) {
+    const tryObs = new IntersectionObserver(entries => {
+      if (entries.some(en => en.isIntersecting)) { fullFonts(); tryObs.disconnect(); }
+    }, { rootMargin: '200px 0px' });
+    tryObs.observe(box);
+  }
   box.addEventListener('paste', e => {  // words only, not the styles they came with
     e.preventDefault(); const t = (e.clipboardData || window.clipboardData).getData('text'), sel = getSelection();
     if (!sel.rangeCount) return; sel.deleteFromDocument(); sel.getRangeAt(0).insertNode(document.createTextNode(t)); sel.collapseToEnd();
@@ -1187,7 +1238,11 @@ function wire() {
   for (const a of document.querySelectorAll('a[data-to]')) a.addEventListener('click', e => { e.preventDefault(); $(a.dataset.to).scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }); });
   document.addEventListener('visibilitychange', () => { music(); if (cine.on ? cine.playing : st.playing) vo.hold(document.hidden); });
   new MutationObserver(() => sync()).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => sync());
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    try { if (localStorage.getItem('yisu-theme')) return; } catch (_) {}
+    if (e.matches) root.dataset.theme = 'dark'; else delete root.dataset.theme;
+    sync();
+  });
   let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (window.innerWidth !== st.width) { cache.clear(); init(true); } else { rain.w = window.innerWidth; rain.h = window.innerHeight; rain.ctx = fit($('rain'), rain.w, rain.h); rain.top = fit($('sparks'), rain.w, rain.h); } }, 300); });
 }
 const start = () => {

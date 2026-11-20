@@ -6,8 +6,8 @@ FONTS is a checkout of https://github.com/zjlgdx/yisu-fonts. Every character
 there is a list of centre lines on a 1000 grid (y down), in the order they are
 drawn; this writes them as {char: [[kind, [x, y, x, y, ...]], ...]}:
 
-    public/strokes.js      the characters index.html itself shows, loaded with the page
-    public/strokes-all.js  every other character, loaded when a reader asks for one
+    public/strokes.js          the characters index.html itself shows, loaded with the page
+    public/strokes/00..1f.json every other character, sharded into 32 buckets loaded on demand
 """
 import json
 import sys
@@ -15,6 +15,7 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parent.parent
 PUB = SITE / 'public'
+BUCKETS = 32
 FONTS = Path(sys.argv[1]).resolve()
 sys.path[:0] = [str(FONTS), str(FONTS / 'tools')]
 import build
@@ -56,6 +57,20 @@ def write(name, chars):
     print(f'{name}: {len(data)} characters, {path.stat().st_size // 1024} KB')
 
 
+def write_buckets(chars):
+    out_dir = PUB / 'strokes'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    buckets = [{} for _ in range(BUCKETS)]
+    for ch in chars:
+        buckets[ord(ch) & (BUCKETS - 1)][ch] = strokes(ch)
+    total = 0
+    for i, data in enumerate(buckets):
+        p = out_dir / f'{i:02x}.json'
+        p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        total += p.stat().st_size
+    print(f'strokes/*.json: {len(chars)} characters in {BUCKETS} buckets, {total // 1024} KB total (~{total // BUCKETS // 1024} KB/bucket)')
+
+
 page = [ch for ch in dict.fromkeys((PUB / 'index.html').read_text(encoding='utf-8')) if ch in hanzi.C]
 write('strokes.js', page)
-write('strokes-all.js', [ch for ch in hanzi.C if ch not in page])
+write_buckets([ch for ch in hanzi.C if ch not in page])
