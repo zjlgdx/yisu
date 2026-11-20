@@ -116,7 +116,7 @@ $FONTS/.venv/bin/python tools/music.py
 
 The site counts visits and what readers do, without cookies and without keeping who anyone is:
 
-- **Visits:** [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/), turned on for the hostname in the Cloudflare dashboard. Cloudflare adds its beacon to the page as it serves it; nothing for it is in this repository.
+- **Visits:** [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/). Its beacon is the last script in `index.html`; the token in it only names the site to count, and the numbers are in the Cloudflare dashboard under Web Analytics.
 - **What readers do:** the page posts a name and a short value to `/e` (朗讀 or the music turned on, a text or a family picked, the scroll written to its end, 觀影 opened and watched through, a character looked up in 字庫, the box to type in used). `src/worker.js` takes only the names and values it knows, and writes each to [Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) with the reader's country and whether it came from a phone. It keeps no IP address, no user agent and nothing typed into the box to type in.
 - Nothing is sent from a copy run anywhere but the site and `wrangler dev`, or from a browser that sends Global Privacy Control or Do Not Track.
 
