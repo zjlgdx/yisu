@@ -21,7 +21,7 @@
 <link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="fonts/huasha-400.woff2?v=ac5c7b78" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/huasha-400.woff2?v=f7cad013" as="font" type="font/woff2" crossorigin>
 <!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
      browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
 <link rel="stylesheet" href="fonts/faces.css?2">
@@ -31,7 +31,7 @@
    differs between them is all in the tokens. The three families' faces are in fonts/faces.css. */
 :root {
   --mode: light; color-scheme: light;
-  --paper: #efeee9; --fibre: #e3e1d9; --panel: #f6f5f1; --ink: #1d1c1b; --soft: #5e5b55; --seal: #b3362b; --accent: #b3362b; --line: #cfccc2;
+  --paper: #efeee9; --fibre: #e3e1d9; --panel: #f6f5f1; --ink: #1d1c1b; --soft: #5e5b55; --seal: #b3362b; --accent: #b3362b; --line: #cfccc2; --edge: #8a867b;
   --cine-stage: #171615; --cine-paper: #f6f5f1; --cine-ink: #1d1c1b; --cine-band: #56707c; --cine-soft: #a39f94; --cine-moon: transparent; --cine-glow: transparent;
   --band: #56707c; --band-w: 14px; --grain: #b08020; --on-bg: #1d1c1b; --on-fg: #efeee9;
   --night-block: none; --night-flex: none; --glow: none;
@@ -40,8 +40,8 @@
   --text: "Yisu Huasha", "Songti TC", "Noto Serif TC", "PMingLiU", serif;
   --pen-font: "Yisu Huasha";
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
-:root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --edge: #5f6a80; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; } }
+:root[data-theme="dark"] { --mode: dark; color-scheme: dark; --paper: #0b0f17; --fibre: #121927; --panel: transparent; --ink: #ece8da; --soft: #97a0b2; --seal: #c4472f; --accent: #d9b45a; --line: #263043; --edge: #5f6a80; --cine-stage: #070a10; --cine-paper: transparent; --cine-ink: #ece8da; --cine-band: transparent; --cine-soft: #7f8798; --cine-moon: #ece8da; --cine-glow: rgba(236, 232, 218, .35); --band: transparent; --band-w: 0px; --grain: #d9b45a; --on-bg: #d9b45a; --on-fg: #0b0f17; --night-block: block; --night-flex: flex; --glow: drop-shadow(0 0 5px rgba(236, 232, 218, .35)); --paper-image: linear-gradient(#0b0f17, #121927 60%, #0b0f17); --paper-size: 100% 100%; }
 html, body { height: auto; }
 body { margin: 0; background-color: var(--paper); background-image: var(--paper-image); background-size: var(--paper-size); background-position: 0 0, 3px 5px;
   color: var(--ink); font-family: var(--text); font-size: 18px; line-height: 1.7; }
@@ -66,7 +66,7 @@ a { color: inherit; }
 .ctl button:disabled { opacity: .4; cursor: default; }
 .ctl button svg { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .ctl label { display: inline-flex; align-items: center; gap: 8px; }
-.ctl input[type="range"] { accent-color: var(--accent); width: 130px; }
+.ctl input[type="range"] { accent-color: var(--accent); width: 130px; height: 44px; margin: 0; }
 
 nav { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: space-between; font-size: 16px; color: var(--soft); }
 nav .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
@@ -137,6 +137,7 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .cells button { border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: none; padding: 9px 4px; min-height: 48px;
   font: 400 30px/1 var(--pen-font), var(--text); color: var(--ink); }
+@media (min-width: 1000px) { .cells { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); } .cells button { min-height: 82px; font-size: 46px; } }
 .cells button[aria-pressed="true"] { background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .big { border: 1px solid var(--line); background-color: var(--panel); padding: 10px; position: relative;
   background-image: linear-gradient(var(--line), var(--line)), linear-gradient(var(--line), var(--line)); background-size: 100% 1px, 1px 100%; background-position: center, center; background-repeat: no-repeat; }
@@ -149,7 +150,7 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .ask input { width: 4.5em; font: inherit; text-align: center; padding: 6px 8px; min-height: 28px; border: 1px solid var(--ink); border-radius: 3px; background: var(--panel); color: var(--ink); }
 .ask button { border: 1px solid var(--on-bg); border-radius: 3px; padding: 6px 18px; min-height: 42px; background: var(--on-bg); color: var(--on-fg); }
 .ask output { color: var(--soft); font-size: 15px; flex-basis: 100%; min-height: 1.7em; }
-.try { border: 1px solid var(--line); background: var(--panel); margin-top: 12px; padding: 16px 20px; min-height: 2.6em; max-height: 70vh; overflow: auto;
+.try { border: 1px solid var(--edge); background: var(--panel); margin-top: 12px; padding: 16px 20px; min-height: 2.6em; max-height: 70vh; overflow: auto;
   font: 400 44px/1.5 "Yisu Huasha", var(--text); white-space: pre-wrap; overflow-wrap: anywhere; }
 .try.v { writing-mode: vertical-rl; height: 8.4em; max-height: none; width: 100%; box-sizing: border-box; }   /* its width would grow with the text */
 .facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 22px; margin: 4px 0 18px; max-width: 40em; }
@@ -161,6 +162,7 @@ h2 { font-weight: 400; font-size: 17px; letter-spacing: .3em; color: var(--accen
 .en { max-width: 38em; }
 .en p { margin: 0 0 12px; }
 footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--soft); font-size: 15px; }
+footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
 
 @media (pointer: coarse) { .ctl button { min-height: 44px; } nav .links a { padding: 11px 8px; } }
 @media (max-width: 760px) {
@@ -173,7 +175,9 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   .pair { gap: 18px; } .vert { font-size: 40px; }
   .try { font-size: 34px; padding: 12px 14px; }
 }
-@media (max-width: 520px) { .theme span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .theme svg { margin-right: 0 !important; } }
+@media (max-width: 520px) {
+  nav { row-gap: 4px; } nav .links { order: 3; flex: 1 0 100%; justify-content: space-between; gap: 0; } nav .links a { padding-inline: 2px; }
+  .theme span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .theme svg { margin-right: 0 !important; } }
 /* The viewing mode: the scroll alone on a dark table (by night, on the sky itself), large, the
    camera following the pen. The script sizes what is in it, since it knows the screen. */
 .cine-on { overflow: hidden; }
@@ -205,18 +209,20 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
 .cine[data-phase="wide"] #cine-roll, .cine[data-phase="wide"] #cine-far, .cine[data-phase="end"] #cine-far { transition: transform 3.4s cubic-bezier(.4, 0, .2, 1); }
 .cine.settled #cine-roll { opacity: 0; transition: transform 3.4s cubic-bezier(.4, 0, .2, 1), opacity 1.2s; }
 /* A narrow screen: the buttons take two rows, so the band above the scroll is taller, and the
-   name shows when the buttons have gone. A short one (a phone on its side): smaller buttons. */
+   name sits beside the second row. A short one (a phone on its side): smaller buttons, 40 px. */
 @media (max-width: 620px) {
   .cine-view { top: 15%; height: 66%; }
   .cine-ctl { font-size: 13px; gap: 6px 8px; }
-  .cine-ctl button { padding: 4px 10px; min-height: 36px; }
-  .cine:not(.idle) .cine-label { opacity: 0; }
+  .cine-ctl button { padding: 4px 10px; min-height: 44px; }
+  .cine-label { top: calc(2.2% + env(safe-area-inset-top, 0px) + 50px); line-height: 44px; font-size: 13px; letter-spacing: .2em; }
+  .cine-label i { margin-left: .8em; }
 }
 @media (max-height: 500px) {
   .cine-ctl { font-size: 13px; top: calc(1% + env(safe-area-inset-top, 0px)); }
-  .cine-ctl button { padding: 2px 10px; min-height: 30px; }
-  .cine-label { font-size: 12px; }
+  .cine-ctl button { padding: 2px 10px; min-height: 40px; }
+  .cine-label { font-size: 12px; top: calc(3.4% + env(safe-area-inset-top, 0px)); line-height: 1; }
 }
+@media (max-width: 620px) and (max-height: 500px) { .cine:not(.idle) .cine-label { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .cine * { transition: none !important; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -334,7 +340,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
   <p class="lead">六千八百多個常用字，繁體、簡體和注音。點一個字，或自己寫一個，看它一筆一筆寫出來。</p>
   <form class="ask" id="ask"><label for="ask-in">想看哪個字</label><input id="ask-in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="ask-msg"><button type="submit">寫</button><output id="ask-msg"></output></form>
   <div class="lib">
-    <div class="cells" id="cells" role="group" aria-label="選一個字" data-spec="永和九年歲在暮春之初會于山陰蘭亭群賢畢至少長咸集崇峻茂林脩竹清流激湍"></div>
+    <div class="cells" id="cells" role="group" aria-label="選一個字" data-spec="永和九年歲在暮春之初會于山陰蘭亭群賢畢至少長咸集崇峻茂林脩竹清流激湍映帶左右引以"></div>
     <div>
       <div class="big"><canvas id="big" role="img" aria-label="放大的筆順"></canvas><span class="count" id="count"></span></div>
       <div class="three" id="three" aria-hidden="true"><span style="font-family:'Yisu Yinni',var(--text)"><i></i><small>印泥</small></span><span style="font-family:'Yisu Huasha',var(--text)"><i></i><small>畫沙</small></span><span style="font-family:'Yisu Louhen',var(--text)"><i></i><small>漏痕</small></span></div>
@@ -1027,7 +1033,7 @@ function cineCamera(dt, snap) {
    Returns how far there is to travel. */
 function cinePull() {
   const w = cine.roll, far = $('cine-far'), view = $('cine-view'), span = view.clientWidth, top = parseFloat(w.cv.style.top) || 0;
-  const whole = Math.min(1, span * 0.94 / w.W), least = Math.min(1, 12 / w.o.cell), all = whole >= least * 0.75, s = all ? whole : least;
+  const whole = Math.min(1, span * 0.94 / w.W), least = Math.min(1, 20 / w.o.cell), all = whole >= least * 0.75, s = all ? whole : least;
   const from = all ? (span - w.W * s) / 2 : span * 0.04, to = all ? from : span * 0.96 - w.W * s;
   const x = cine.shot === 2 ? to : from, y = cine.h / 2 - view.offsetTop - w.H * s / 2 - top;
   // The whole scroll, drawn at the size it will be seen. While the camera pulls back, the canvas
