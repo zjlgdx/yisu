@@ -1,10 +1,17 @@
-# The page's own first files (index.html, strokes.js, fonts/faces.css, audio/vo.json) are asked
-# for again on every visit, so a new text or a new cut of the fonts shows at once. What they
-# point to changes only when the fonts or the texts do: a day in the cache, and a week more
-# while a newer copy is fetched behind. faces.css names each font with a mark of its contents.
+# The page's own first files (index.html, strokes.js, fonts/faces.css, audio/vo.json,
+# fonts/full/index.json) are asked for again on every visit, so a new text or a new cut of
+# the fonts shows at once. Every font is asked for with a mark of its contents (?v= in
+# faces.css and index.json), so a font file never needs asking again: a new cut is a new
+# address. (The splat takes in fonts/full/ too.) A clip is asked for with its length, which
+# changes when it is made again, but two takes can match: a day, and a week more while a
+# newer copy is fetched behind. The same for the icons and the share image.
 /fonts/*.woff2
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=31536000, immutable
 /audio/*.mp3
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/favicon.*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /og.png
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
