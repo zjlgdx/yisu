@@ -20,7 +20,7 @@
 <link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="fonts/huasha-400.woff2?v=bc1a8970" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/huasha-400.woff2?v=ac5c7b78" as="font" type="font/woff2" crossorigin>
 <!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
      browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
 <link rel="stylesheet" href="fonts/faces.css?2">
@@ -393,7 +393,7 @@ footer { margin-top: 60px; padding-top: 14px; border-top: 1px solid var(--line);
     <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">Download</a><a href="https://github.com/zjlgdx/yisu-fonts" target="_blank" rel="noopener">Source</a></div>
   </div>
 
-  <footer>這一頁的字，連同你正在讀的這一行，都是一粟自己寫的。朗讀由 MiniMax 語音合成。<a href="https://github.com/zjlgdx/yisu" target="_blank" rel="noopener">網站原始碼</a></footer>
+  <footer>這一頁的字，連同你正在讀的這一行，都是一粟自己寫的。朗讀由 MiniMax 語音合成。這裡只數有多少人來、按了哪些鈕，不用 cookie，也不記你是誰。<a href="https://github.com/zjlgdx/yisu" target="_blank" rel="noopener">網站原始碼</a></footer>
 </div>
 
 <div class="cine" id="cine" hidden data-phase="title" tabindex="-1" role="dialog" aria-modal="true" aria-label="觀影">
@@ -710,6 +710,10 @@ const PIECES = {
 const LIB = [...$('cells').dataset.spec];
 const st = { mode: '', piece: 'lanting', picked: false, pen: 'sand', char: '永', sound: false, read: false, rate: 1.5, playing: true, asked: false, touched: 0, width: 0 };
 const W = {};
+// What readers do, counted without a cookie (src/worker.js keeps a name, a value, the country and
+// phone or not). Only on the site itself, and not for a reader whose browser asks not to be tracked.
+const COUNT = /^(yisu\.aixie\.de|localhost:8787)$/.test(location.host) && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1';
+const ev = (n, v = '') => { if (COUNT) try { navigator.sendBeacon('/e', JSON.stringify({ n, v })); } catch (e) { /* not counted */ } };
 const rain = { grains: [], sparks: [], ctx: null, top: null, w: 0, h: 0, color: '#b08020', alpha: 1, clock: 0 };
 const PICK = Object.keys(PIECES).map(k => 'piece-' + k);
 const press = (ids, on) => { for (const id of ids) $(id).setAttribute('aria-pressed', id === on); };
@@ -827,7 +831,7 @@ function init(keep) {
       if (it.row === 0 && performance.now() - st.touched > 4000) scroller.scrollTo({ left: Math.max(0, it.x - scroller.clientWidth * 0.3), behavior: REDUCED ? 'auto' : 'smooth' });
     },
     onMove: progress,
-    onDone: w => { progress(w); vo.stop(); playing(false); },
+    onDone: w => { progress(w); vo.stop(); playing(false); if (!st.skip) ev('done', st.piece); },
   });
   W.sent = sentences(W.roll); W.roll.shown = scroller.shown;
   $('note').textContent = piece.note + (W.roll.W > scroller.clientWidth + 4 ? '，卷可以左右拖動。' : '。');
@@ -926,6 +930,7 @@ const cine = { on: false, full: false, phase: 'title', playing: true, piece: '',
 const CINE_BAND = 8;                    // the mount above and below the paper, as the styles draw it
 const cineLater = (fn, ms) => { clearTimeout(cine.timer); cine.timer = setTimeout(fn, ms); };
 function cinePhase(p) {                 // title, roll, wide (pulling back), end
+  if (p === 'end' && cine.phase !== 'end') ev('cine-end', st.piece);
   cine.phase = p; $('cine').dataset.phase = p; $('cine-end').hidden = p !== 'end';
   if (cine.roll) cine.roll.on = p === 'roll' && cine.playing;
   if (cine.card) cine.card.on = p === 'title' && cine.playing;
@@ -1045,7 +1050,7 @@ function cinePlay(on) { cine.playing = on; $('cine-play').dataset.on = on; $('ci
 function cineOpen() {
   if (cine.on) return;
   const box = $('cine');
-  cine.was = { read: st.read, sound: st.sound }; cine.on = true; cine.full = false;
+  cine.was = { read: st.read, sound: st.sound }; cine.on = true; cine.full = false; ev('cine', st.piece);
   W.roll.on = false; vo.stop();
   st.read = true; st.sound = true; vo.prime(); music();
   for (const id of ['cine-read', 'cine-sound']) $(id).setAttribute('aria-pressed', true);
@@ -1111,11 +1116,11 @@ function wire() {
   });
   seg(['pen-clay', 'pen-sand', 'pen-rain'], b => {
     st.pen = b.dataset.pen; root.style.setProperty('--pen-font', `"${FONT[st.pen]}"`);
-    W.roll.setPen(st.pen); W.quote.setPen(st.pen); W.big.o.pen = st.pen; W.big.reset(0); W.big.on = !REDUCED; if (REDUCED) W.big.reset(1);
+    W.roll.setPen(st.pen); W.quote.setPen(st.pen); ev('pen', st.pen); W.big.o.pen = st.pen; W.big.reset(0); W.big.on = !REDUCED; if (REDUCED) W.big.reset(1);
   });
-  toggle('sound', on => { st.sound = on; music(); });
+  toggle('sound', on => { st.sound = on; music(); if (on) ev('sound', st.mode); });
   toggle('read', on => {
-    st.read = on; for (const id of ['slow', 'mid', 'fast']) $(id).disabled = on;
+    st.read = on; if (on) ev('read', st.piece); for (const id of ['slow', 'mid', 'fast']) $(id).disabled = on;
     if (!on) { vo.stop(); W.roll.o.rate = st.rate; return; }
     // from the top of the sentence being written; the first clip starts in this click, which is what lets it play
     const w = W.roll; let from = w.done || w.i >= w.main ? 0 : W.sent.starts[W.sent.of[w.i]];
@@ -1124,9 +1129,9 @@ function wire() {
   });
   seg(['slow', 'mid', 'fast'], b => { st.rate = +b.dataset.rate; W.roll.o.rate = st.rate; });
   $('again').addEventListener('click', () => { restart(0); if (st.read) vo.say(0); });
-  $('finish').addEventListener('click', () => { st.asked = true; W.roll.finish(); $('scroll').scrollTo({ left: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
+  $('finish').addEventListener('click', () => { st.asked = true; st.skip = true; W.roll.finish(); st.skip = false; ev('finish', st.piece); $('scroll').scrollTo({ left: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
   $('more-btn').addEventListener('click', () => { const open = $('more').hidden; $('more').hidden = !open; $('more-btn').setAttribute('aria-expanded', open); });
-  seg(PICK, b => { st.piece = b.dataset.piece; st.picked = true; st.asked = true; playing(true); init(); if (st.read) vo.say(0); });
+  seg(PICK, b => { st.piece = b.dataset.piece; st.picked = true; ev('piece', st.piece); st.asked = true; playing(true); init(); if (st.read) vo.say(0); });
   for (const id of ['theme-light', 'theme-dark']) $(id).addEventListener('click', () => {
     root.dataset.theme = $(id).dataset.set; try { localStorage.setItem('yisu-theme', root.dataset.theme); } catch (e) { /* the choice lasts this visit only */ }
     sync();
@@ -1134,7 +1139,7 @@ function wire() {
   $('ask').addEventListener('submit', e => {
     e.preventDefault(); const ch = [...$('ask-in').value.trim()].pop(); if (!ch) return;
     $('ask-msg').textContent = ''; fullFonts();
-    loadAll().then(() => { if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
+    loadAll().then(() => { if (/\p{Script=Han}/u.test(ch)) ev(S[ch] ? 'char' : 'missing', ch); if (S[ch] && ch !== '') showChar(ch); else $('ask-msg').textContent = `「${ch}」還沒寫到。字庫現在有六千八百多個常用字，一輪一輪在補。`; },
       () => { whole = null; $('ask-msg').textContent = '字庫沒有載入，請再試一次。'; });
   });
   // the tester: the fonts themselves
@@ -1144,7 +1149,7 @@ function wire() {
   seg(['try-regular', 'try-bold'], b => { tried.weight = +b.dataset.w; dress(); });
   seg(['try-h', 'try-v'], b => box.classList.toggle('v', b.dataset.v === '1'));
   $('try-size').addEventListener('input', () => { box.style.fontSize = $('try-size').value + 'px'; });
-  box.addEventListener('focus', fullFonts, { once: true });
+  box.addEventListener('focus', () => { fullFonts(); ev('try'); }, { once: true });
   box.addEventListener('paste', e => {  // words only, not the styles they came with
     e.preventDefault(); const t = (e.clipboardData || window.clipboardData).getData('text'), sel = getSelection();
     if (!sel.rangeCount) return; sel.deleteFromDocument(); sel.getRangeAt(0).insertNode(document.createTextNode(t)); sel.collapseToEnd();

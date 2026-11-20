@@ -39,7 +39,8 @@
 - 本地預覽：`python3 -m http.server --directory public`
 - 字型每次發佈後，用字型倉庫（`out/` 已建好）重跑 `tools/strokes.py`、`tools/webfonts.py FONTS full`、`tools/mark.py`、`tools/og.py`。
 - 朗讀用 MiniMax 語音合成（`tools/audio.py`），再用 `tools/hear.py` 以 whisper 轉寫逐音比對檢查讀音。
-- 部署：`npx wrangler deploy`（Cloudflare Workers 靜態資源）。
+- 統計：訪問數用 Cloudflare Web Analytics；讀者按了什麼由 `src/worker.js` 記到 Workers Analytics Engine，只記事件名、國家和是否手機，不用 cookie，不記 IP。`tools/events.py` 讀出來，包括讀者在字庫找了、字型還沒有的字。
+- 部署：`npx wrangler deploy`（Cloudflare Workers：靜態資源加一個小 Worker）；本地試 Worker 用 `npx wrangler dev`。
 
 細節見 [README.md](README.md)。
 

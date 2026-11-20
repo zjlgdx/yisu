@@ -64,8 +64,9 @@ The page writes a classical text a stroke at a time, in vertical columns from ri
 | `public/og.png`, `favicon.*`, `apple-touch-icon.png` | The share image and the mark (滄海一粟: one stroke with a grain above it). Generated. |
 | `public/404.html` | The page for an address that isn't there. |
 | `public/_headers` | Cache rules: fonts and sound for a day; the files the page starts from are asked for again on each visit. |
-| [`tools/`](tools) | The scripts that make the generated files, and the check on the narration. |
-| [`wrangler.jsonc`](wrangler.jsonc) | The Cloudflare Workers configuration: static assets, no script of its own. |
+| [`src/worker.js`](src/worker.js) | The Worker. It answers only `/e`, the page's count of what readers do; every other address is a file from `public/`. |
+| [`tools/`](tools) | The scripts that make the generated files, the check on the narration, and the counts. |
+| [`wrangler.jsonc`](wrangler.jsonc) | The Cloudflare Workers configuration: the assets, the Worker, and the Analytics Engine dataset it writes to. |
 
 ## Working on it
 
@@ -111,15 +112,29 @@ $FONTS/.venv/bin/python tools/music.py
 2. Add its name to `PIECES` in `tools/audio.py` and to the list in `tools/hear.py`.
 3. Run everything above again.
 
+### Counting
+
+The site counts visits and what readers do, without cookies and without keeping who anyone is:
+
+- **Visits:** [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/), turned on for the hostname in the Cloudflare dashboard. Cloudflare adds its beacon to the page as it serves it; nothing for it is in this repository.
+- **What readers do:** the page posts a name and a short value to `/e` (朗讀 or the music turned on, a text or a family picked, the scroll written to its end, 觀影 opened and watched through, a character looked up in 字庫, the box to type in used). `src/worker.js` takes only the names and values it knows, and writes each to [Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) with the reader's country and whether it came from a phone. It keeps no IP address, no user agent and nothing typed into the box to type in.
+- Nothing is sent from a copy run anywhere but the site and `wrangler dev`, or from a browser that sends Global Privacy Control or Do Not Track.
+
+```
+CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... python3 -I tools/events.py 30
+```
+
+prints the last 30 days: each event with its values, where they came from, and the characters readers looked for that the fonts don't have yet, most wanted first. The token needs *Account Analytics: Read*.
+
 ### Deploying
 
-The site is static files served by a Cloudflare Worker at [yisu.aixie.de](https://yisu.aixie.de):
+The site is static files and a small Worker at [yisu.aixie.de](https://yisu.aixie.de):
 
 ```
 npx wrangler deploy
 ```
 
-`public/fonts/full/` is not in the repository, so make it first (`tools/webfonts.py FONTS full`). Without it, the box to type in falls back to the reader's own fonts for characters the page doesn't already show.
+`public/fonts/full/` is not in the repository, so make it first (`tools/webfonts.py FONTS full`). Without it, the box to type in falls back to the reader's own fonts for characters the page doesn't already show. To try the Worker before deploying, `npx wrangler dev` serves the whole site with `/e` at `http://localhost:8787`.
 
 ## History
 
