@@ -947,9 +947,9 @@ function playing(on) { st.playing = on; $('play').dataset.on = on; $('play').tex
 function restart(n) { const sc = $('scroll'); vo.stop(); st.asked = true; playing(true); W.roll.reset(n); W.roll.o.rate = st.rate; W.roll.on = true; if (!n) sc.scrollLeft = sc.scrollWidth; }
 /* ---------- the viewing mode: the scroll alone, large, the camera following the pen ----------
    A title written in the middle of the screen; then the text, six to a column (eight on an
-   upright screen), with the sentence being written as a caption; then the whole scroll, end to
+   upright screen), with the clause being read as a caption; then the whole scroll, end to
    end. It reads aloud and plays the music unless the reader turns them off there. */
-const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, shot: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null };
+const cine = { on: false, full: false, phase: 'title', playing: true, piece: '', tx: 0, shot: 0, timer: 0, again: 0, moved: 0, w: 0, h: 0, roll: null, card: null, tone: {}, was: null, cap: '' };
 const CINE_BAND = 8;                    // the mount above and below the paper, as the styles draw it
 const cineLater = (fn, ms) => { clearTimeout(cine.timer); cine.timer = setTimeout(fn, ms); };
 function cinePhase(p) {                 // title, roll, wide (pulling back), end
@@ -970,13 +970,28 @@ function cineRuns(w) {
   if (a >= 0) runs.push([a, w.main]);
   return { runs, at };
 }
-/* The caption: the run being written, in the Typewriter's hand; what is written is bright. */
+/* The run the voice is saying: in the clip playing, the clause whose mark (vo.json) it has
+   passed. -1 when no clip is being heard, or its clauses aren't known. */
+function cineHeard(w, c) {
+  const k = vo.k, marks = vo.times && vo.times.marks && vo.times.marks[st.piece] && vo.times.marks[st.piece][k];
+  if (!st.read || k < 0 || !vo.started || !marks) return -1;
+  const t = vo.el.currentTime || 0, end = W.sent.starts[k + 1] || w.main;
+  let j = 0; while (j < marks.length && t >= marks[j]) j++;
+  for (let i = W.sent.starts[k]; i < end; i++) if (W.sent.clause[i] === j && !PUNCT.includes(w.items[i].ch)) return c.at[i];
+  return -1;
+}
+/* The caption: the clause being read, in the Typewriter's hand; what is written is bright. With
+   the reading on it turns when the voice reaches the next clause, not when the pen does (the pen
+   is a little ahead or behind); without it, when the pen touches the next clause. */
 function cineCaption(w) {
-  const cv = $('cine-sub');
-  if (w.i >= w.main) { fit(cv, 1, 1); return; }
-  // Until the pen touches a new clause, the one just written stays: the voice is still on it.
-  const c = w.clauses || (w.clauses = cineRuns(w)), fresh = w.i > 0 && c.at[w.i] !== c.at[w.i - 1] && !w.s && !w.p;
-  const run = c.runs[c.at[fresh ? w.i - 1 : w.i]], n = run[1] - run[0];
+  const cv = $('cine-sub'), c = w.clauses || (w.clauses = cineRuns(w));
+  let r = cineHeard(w, c);
+  if (r < 0 && w.i < w.main) r = c.at[w.i > 0 && c.at[w.i] !== c.at[w.i - 1] && !w.s && !w.p ? w.i - 1 : w.i];
+  const key = `${r} ${w.i} ${cine.w} ${cine.h}`;
+  if (key === cine.cap) return;
+  cine.cap = key;
+  if (r < 0) { fit(cv, 1, 1); return; }
+  const run = c.runs[r], n = run[1] - run[0];
   const size = Math.max(14, Math.min(Math.round(cine.h * 0.056), Math.floor(cine.w * 0.9 / n)));
   const ctx = fit(cv, n * size, size); ctx.fillStyle = '#ece8da';
   for (let i = run[0]; i < run[1]; i++) { ctx.globalAlpha = i < w.i ? 1 : 0.3; glyph(ctx, w.items[i].ch, 'clay', 0, (i - run[0]) * size, 0, size); }
@@ -992,7 +1007,7 @@ function cineLayout(keep) {
   const had = keep && cine.roll ? cine.roll.i : 0;
   if (!keep) { clearTimeout(cine.timer); cine.phase = 'title'; cine.shot = 0; box.classList.remove('settled'); $('cine-far').style.transition = ''; vo.stop(); }
   if (cine.roll) { writers.delete(cine.roll); writers.delete(cine.card); }
-  cine.piece = st.piece; cine.w = box.clientWidth; cine.h = box.clientHeight;
+  cine.piece = st.piece; cine.cap = ''; cine.w = box.clientWidth; cine.h = box.clientHeight;
   cine.tone = { ink: look.getPropertyValue('--cine-ink').trim(), soft: look.getPropertyValue('--cine-soft').trim() };
   for (const b of $('cine-label').children) b.hidden = b.dataset.piece !== st.piece;
   const room = view.clientHeight - CINE_BAND * 2, rows = cine.w > cine.h * 1.2 ? 6 : 8;
@@ -1069,6 +1084,7 @@ function cineWake() { cine.moved = performance.now(); $('cine').classList.remove
 function cineTick(dt) {
   if (!cine.on) return;
   cineCamera(dt);
+  if (cine.phase === 'roll') cineCaption(cine.roll);        // the voice moves on between strokes
   if (cine.phase === 'roll' && cine.playing && performance.now() - cine.moved > 2500) $('cine').classList.add('idle');
 }
 function cinePlay(on) { cine.playing = on; $('cine-play').dataset.on = on; $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
