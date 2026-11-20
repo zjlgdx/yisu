@@ -387,7 +387,7 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
       <li>macOS：下載 <code>.otf</code>，點兩下打開，按「安裝」。</li>
       <li>Windows：在 <code>.otf</code> 上按右鍵，選「安裝」。</li>
       <li>Linux：放進 <code>~/.local/share/fonts</code>，再執行 <code>fc-cache -f</code>。</li>
-      <li>網頁：用 <code>.woff2</code>，在 CSS 裡寫 <code>@font-face { font-family: "Yisu"; src: url(YisuHuasha-Regular.woff2) format("woff2"); }</code>。</li>
+      <li>網頁：完整的 <code>.woff2</code> 每個有 6 到 11 MB，直接放上網頁，要先下載好幾 MB 才看得到字。先把頁面用到的字切出來：裝好 <code>pip install fonttools brotli</code>，執行 <code>pyftsubset YisuHuasha-Regular.otf --text-file=page.txt --flavor=woff2 --output-file=yisu-huasha.woff2</code>（<code>page.txt</code> 放頁面上的文字），再在 CSS 裡寫 <code>@font-face { font-family: "Yisu Huasha"; src: url(yisu-huasha.woff2) format("woff2"); }</code>。文字常變的網站，可以像這一頁一樣，把字型切成幾十個小檔，各配一段 <code>unicode-range</code>，瀏覽器就只下載用到的那幾個。</li>
     </ul>
   </details>
   <p class="from" style="margin-top:14px">檔名是 YisuYinni（印泥）、YisuHuasha（畫沙）和 YisuLouhen（漏痕）。0.730 以前的版本叫 Pinboard Typewriter、Ballpoint 和 Marker。</p>
@@ -397,6 +397,7 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
     <p>Yisu (一粟, “one grain of millet”) is a set of three open-source Chinese typefaces. Each one is written by hand, a stroke at a time, with a different pen: Yinni is a typewriter’s Fangsong, Huasha is a ballpoint’s Kaishu, and Louhen is a chisel-tip marker.</p>
     <p>Each has 6,804 Chinese characters, Traditional and Simplified, with Zhuyin, Latin letters and figures, in Regular and Bold. Nothing is traced or measured from another font. The scroll at the top of this page writes the fonts’ own strokes in order; the samples under 三筆 are the fonts themselves.</p>
     <p>The name is from Su Shi’s <i>Ode on the Red Cliff</i>: a person between heaven and earth is one grain of millet in the sea. The fonts are free under the SIL Open Font License 1.1.</p>
+    <p>Install the <code>.otf</code> files. For a web page, subset a <code>.woff2</code> to the characters the page uses first (each full one is 6–11 MB): <code>pyftsubset YisuHuasha-Regular.otf --text-file=page.txt --flavor=woff2</code>, from fontTools, or split it by <code>unicode-range</code> as this page does.</p>
     <div class="get"><a class="main" href="https://github.com/zjlgdx/yisu-fonts/releases/latest" target="_blank" rel="noopener">Download</a><a href="https://github.com/zjlgdx/yisu-fonts" target="_blank" rel="noopener">Source</a></div>
   </div>
 
