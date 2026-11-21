@@ -23,8 +23,9 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/huasha-400.woff2?v=d039093b" as="font" type="font/woff2" crossorigin>
-<!-- ?2 here and on strokes.js, strokes-all.js, vo.json and the tester's index.json: under their bare names
-     browsers kept these for a day. Now they are asked for again on every visit (public/_headers). -->
+<!-- ?2 here and on strokes.js, vo.json and the tester's index.json: under their bare names
+     browsers kept these for a day. Now they are asked for again on every visit (public/_headers).
+     The stroke buckets (strokes/*.json) are asked for with strokes.js's mark of their contents. -->
 <link rel="stylesheet" href="fonts/faces.css?2">
 <style>
 /* One site, two themes from the line the name's story comes from: 天雨粟 by day (rice paper, a
@@ -921,7 +922,7 @@ const loadStroke = ch => {
   if (S[ch]) return Promise.resolve();
   const id = (ch.codePointAt(0) & 31).toString(16).padStart(2, '0');
   if (strokeBuckets.has(id)) return strokeBuckets.get(id);
-  const p = fetch(`strokes/${id}.json?2`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  const p = fetch(`strokes/${id}.json?v=${window.YISU_STROKES_V || 0}`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(data => { Object.assign(S, data); })
     .catch(err => { strokeBuckets.delete(id); throw err; });
   strokeBuckets.set(id, p);

@@ -4,11 +4,12 @@
 # faces.css and index.json), so a font file never needs asking again: a new cut is a new
 # address. (The splat takes in fonts/full/ too.) A clip is asked for with its length, which
 # changes when it is made again, but two takes can match: a day, and a week more while a
-# newer copy is fetched behind. The same for the icons and the share image.
+# newer copy is fetched behind. The same for the icons and the share image. The stroke buckets
+# (strokes/*.json) are asked for with a mark of their contents from strokes.js, as the fonts are.
 /fonts/*.woff2
   Cache-Control: public, max-age=31536000, immutable
 /strokes/*.json
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=31536000, immutable
 /audio/*.mp3
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /favicon.*
