@@ -197,6 +197,12 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
    shot the whole scroll small (--mount keeps its mount in scale). */
 #cine-roll, #cine-far { position: absolute; left: 0; top: 8px; display: block; background: var(--cine-paper); box-shadow: 0 calc(var(--mount, 8px) * -1) 0 var(--cine-band), 0 var(--mount, 8px) 0 var(--cine-band); transform-origin: 0 0; will-change: transform; }
 #cine-far { opacity: 0; }
+.cine-water { position: absolute; left: 0; right: 0; display: var(--night-block); pointer-events: none; transition: opacity 1.2s; }
+.cine-water::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--soft), transparent); opacity: .6; }
+.cine-water canvas { display: block; margin-top: 2px; filter: blur(.4px); -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.cine[data-phase="title"] .cine-water, .cine[data-phase="wide"] .cine-water { opacity: 0; transition: opacity .5s; }
+/* The words sit on the water there, so they darken it under them. */
+:root[data-theme="dark"] .cine-caption canvas { box-sizing: content-box; padding: 10px 70px; background: radial-gradient(ellipse closest-side, var(--cine-stage) 55%, rgba(7, 10, 16, .75) 78%, transparent); }
 .cine-card { position: absolute; inset: 0; display: flex; flex-direction: row-reverse; align-items: center; justify-content: center; gap: 2.4%; transition: opacity .8s; }
 .cine-card canvas, .cine-caption canvas { display: block; }
 #cine-by { align-self: flex-end; }
@@ -426,6 +432,7 @@ footer a { display: inline-block; padding: 9px 0; margin: -9px 0; }
   <div class="cine-moon" aria-hidden="true"></div>
   <div class="cine-label" id="cine-label" aria-hidden="true"><b data-piece="lanting">蘭亭集序<i>王羲之</i></b><b data-piece="chibi">前赤壁賦<i>蘇軾</i></b><b data-piece="tengwang">滕王閣序<i>王勃</i></b></div>
   <div class="cine-view" id="cine-view"><canvas id="cine-far" aria-hidden="true"></canvas><canvas id="cine-roll" role="img"></canvas></div>
+  <div class="cine-water" id="cine-water" aria-hidden="true"><canvas id="cine-mirror"></canvas></div>
   <div class="cine-card" aria-hidden="true"><canvas id="cine-title"></canvas><canvas id="cine-by"></canvas></div>
   <div class="cine-caption" aria-hidden="true"><canvas id="cine-sub"></canvas></div>
   <div class="cine-end ctl" id="cine-end" hidden><button id="cine-again">再看一遍</button></div>
@@ -568,25 +575,21 @@ function glyph(ctx, ch, pk, bold, ox, oy, cell) {
    With reduced motion it is drawn whole and still. */
 const WATER = 0.24;
 const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
-function river(m, w, h) {
-  const t = REDUCED ? 0 : performance.now() / 1000, sc = $('scroll'), sr = sc.getBoundingClientRect();
-  // in motion, only the part in view (and nothing off screen); held still, it may be drawn only once, so all of it
-  if (!REDUCED && (sr.bottom < 0 || sr.top > innerHeight)) return;
-  const x0 = REDUCED ? 0 : Math.max(0, Math.floor(sc.scrollLeft) - 60), x1 = REDUCED ? w.W : Math.min(w.W, Math.ceil(sc.scrollLeft + sc.clientWidth) + 60), vw = x1 - x0;
-  const k = w.cv.height / w.H, ink = css('--ink'), soft = css('--soft');
-  const mo = document.querySelector('.moon').getBoundingClientRect(), mx = sc.scrollLeft + mo.left + mo.width / 2 - sr.left;
-  m.save(); m.clearRect(x0, 0, vw, h);
+function river(m, w, h, x0, x1, mx, shift = 0, glow = 1) {
+  const t = REDUCED ? 0 : performance.now() / 1000, k = w.cv.height / w.H, ink = css('--ink'), soft = css('--soft');
+  const r0 = Math.max(x0, w.ox || 0), r1 = Math.min(x1, (w.ox || 0) + w.cw);          // what the scroll's canvas holds of it
+  m.save(); m.translate(shift, 0); m.clearRect(x0, 0, x1 - x0, h);
   // The reflection, in two passes so it bends in both directions like a surface, not row by row:
   // into a buffer, mirrored and stretched downwards a fifth, each row slid sideways by slow swells;
   // then onto the water in narrow upright strips, each lifted or dropped by the wave under it.
   const B = river.buf || (river.buf = document.createElement('canvas')), bc = B.getContext('2d'), bh = Math.ceil(h * k);
-  for (let c0 = x0; c0 < x1; c0 += 1400) {                          // in pieces, so a long scroll held still fits a canvas
-    const cw = Math.min(1400, x1 - c0), bw = Math.ceil(cw * k);
+  for (let c0 = r0; c0 < r1; c0 += 1400) {                          // in pieces, so a long scroll held still fits a canvas
+    const cw = Math.min(1400, r1 - c0), bw = Math.ceil(cw * k);
     if (B.width !== bw || B.height !== bh) { B.width = bw; B.height = bh; }
     bc.clearRect(0, 0, bw, bh);
     for (let y = 0; y < h; y++) {
       const d = y / h, dx = (Math.sin(y * 0.17 - t * 1.7) * 1.1 + Math.sin(y * 0.063 + t * 0.9) * 2.2) * (0.15 + d * 1.2);
-      bc.globalAlpha = 0.55 * (1 - d * 0.75); bc.drawImage(w.cv, c0 * k, (w.H - 1 - y / 1.2) * k, cw * k, k, dx * k, y * k, cw * k, k + 0.5);
+      bc.globalAlpha = 0.55 * (1 - d * 0.75); bc.drawImage(w.cv, (c0 - (w.ox || 0)) * k, (w.H - 1 - y / 1.2) * k, cw * k, k, dx * k, y * k, cw * k, k + 0.5);
     }
     for (let x = 0; x < cw; x += 3) {
       const X = c0 + x, dy = Math.sin(X * 0.045 + t * 1.3) * 1.5 + Math.sin(X * 0.11 - t * 2.1) * 0.8;
@@ -604,15 +607,15 @@ function river(m, w, h) {
       m.globalAlpha = a; m.beginPath(); m.moveTo(x - l / 2, y); m.quadraticCurveTo(x, y + bow, x + l / 2, y); m.stroke();
     }
   }
-  if (mx > x0 - 140 && mx < x1 + 140) {                             // the moon's path on the water
+  if (glow > 0.02 && mx > x0 - 140 && mx < x1 + 140) {                             // the moon's path on the water
     const g = m.createRadialGradient(0, 0, 0, 0, 0, h); g.addColorStop(0, 'rgba(236,232,218,.17)'); g.addColorStop(0.45, 'rgba(236,232,218,.06)'); g.addColorStop(1, 'rgba(236,232,218,0)');
-    m.save(); m.translate(mx, 0); m.scale(0.75, 1.2); m.globalAlpha = 1; m.fillStyle = g; m.fillRect(-h, 0, 2 * h, h); m.restore();
+    m.save(); m.translate(mx, 0); m.scale(0.75, 1.2); m.globalAlpha = glow; m.fillStyle = g; m.fillRect(-h, 0, 2 * h, h); m.restore();
     m.strokeStyle = ink;
     for (let y = 2; y < h; y += 3) {
       const d = y / h, spread = 8 + d * 52, tick = Math.floor(t * 4 + hash(y, 7) * 4);
       for (let j = 0, n = 2 + Math.round(d * 4); j < n; j++) {
         const u = hash(tick * 3 + j, y) * 2 - 1, x = mx + u * spread + Math.sin(t * 1.3 + y * 0.3) * 2, l = (2 + d * 15) * (0.4 + hash(y + j, tick));
-        m.lineWidth = 0.7 + d * 1.2; m.globalAlpha = (0.9 - d * 0.45) * (1 - u * u) * (0.55 + 0.45 * Math.sin(t * 3 + j + y));
+        m.lineWidth = 0.7 + d * 1.2; m.globalAlpha = glow * (0.9 - d * 0.45) * (1 - u * u) * (0.55 + 0.45 * Math.sin(t * 3 + j + y));
         m.beginPath(); m.moveTo(x - l / 2, y); m.lineTo(x + l / 2, y); m.stroke();
       }
     }
@@ -1024,7 +1027,11 @@ function tick(dt) {
   rain.sparks = rain.sparks.filter(s => s.life > 0); t.globalAlpha = 1;
   rain.clock += dt;
   if (W.mirror && (rain.clock > (REDUCED ? 240 : 33) || dt === 0)) {   // the river under the scroll, about 30 times a second
-    rain.clock = 0; river(W.mirror, W.roll, Math.round(W.roll.H * WATER));
+    rain.clock = 0;
+    // in motion, only the part in view (and nothing off screen); held still, it may be drawn only once, so all of it
+    const w = W.roll, sc = $('scroll'), sr = sc.getBoundingClientRect(), mo = document.querySelector('.moon').getBoundingClientRect();
+    if (REDUCED) river(W.mirror, w, Math.round(w.H * WATER), 0, w.W, sc.scrollLeft + mo.left + mo.width / 2 - sr.left);
+    else if (!cine.on && sr.bottom > 0 && sr.top < innerHeight) river(W.mirror, w, Math.round(w.H * WATER), Math.max(0, Math.floor(sc.scrollLeft) - 60), Math.min(w.W, Math.ceil(sc.scrollLeft + sc.clientWidth) + 60), sc.scrollLeft + mo.left + mo.width / 2 - sr.left);
   }
   const want = vo.live && !vo.el.paused ? 0.22 : 0.6;     // the music steps back for the voice
   if (bgm.out && Math.abs(bgm.level - want) > 0.005) { bgm.level += (want - bgm.level) * Math.min(1, dt / 350); bgm.out.gain.value = bgm.level; }
@@ -1177,11 +1184,31 @@ function cineWide() {
     }, wait + 700);
   }, wait);
 }
+/* By night the scroll stands over the river here too: under the stretch being written, across
+   the screen and down to its foot; and at the end under the whole scroll, small. */
+function cineRiver(dt) {
+  const box = $('cine-water'), p = cine.phase, w = cine.roll;
+  if (!w || p === 'title' || p === 'wide' || getComputedStyle(box).display === 'none') return;
+  cine.clock = (cine.clock || 0) + dt;
+  if (dt && cine.clock < (REDUCED ? 240 : 33)) return;
+  cine.clock = 0;
+  const view = $('cine-view'), far = $('cine-far'), moon = $('cine').firstElementChild;
+  let src = w, shift = Math.round(cine.tx), top = view.offsetTop + (parseFloat(w.cv.style.top) || 0) + w.H + 1;
+  if (p === 'end') {
+    const r = far.getBoundingClientRect(), b = $('cine').getBoundingClientRect();
+    src = { cv: far, H: far.offsetHeight, cw: far.offsetWidth }; shift = Math.round(r.left - b.left); top = r.bottom - b.top + 1;
+  }
+  const h = Math.max(1, Math.round(Math.min(cine.h - top - 2, src.H * 0.45))), key = `${Math.round(top)} ${h} ${cine.w}`;
+  if (key !== cine.wkey) { cine.wkey = key; box.style.top = Math.round(top) + 'px'; cine.water = fit($('cine-mirror'), cine.w, h); }
+  cine.glow = (cine.glow ?? 1) + (($('cine').classList.contains('veil') ? 0 : 1) - (cine.glow ?? 1)) * (REDUCED ? 1 : 0.12);
+  river(cine.water, src, h, -shift, cine.w - shift, moon.offsetLeft + moon.offsetWidth / 2 - shift, shift, cine.glow);
+}
 function cineWake() { cine.moved = performance.now(); $('cine').classList.remove('idle'); }
 function cineTick(dt) {
   if (!cine.on) return;
   cineCamera(dt);
   if (cine.phase === 'roll') cineCaption(cine.roll);        // the voice moves on between strokes
+  cineRiver(dt);
   if (cine.phase === 'roll' && cine.playing && performance.now() - cine.moved > 2500) $('cine').classList.add('idle');
 }
 function cinePlay(on) { cine.playing = on; $('cine-play').dataset.on = on; $('cine-play').textContent = on ? '暫停' : '繼續'; cinePhase(cine.phase); vo.hold(!on); cineWake(); }
@@ -1201,7 +1228,7 @@ function cineClose() {
   if (!cine.on) return;
   cine.on = false; clearTimeout(cine.timer); clearTimeout(cine.again); vo.stop();
   writers.delete(cine.roll); writers.delete(cine.card); ticks.delete(cineTick); cine.roll = cine.card = null;
-  fit($('cine-roll'), 1, 1); fit($('cine-far'), 1, 1);          // give the canvases back
+  fit($('cine-roll'), 1, 1); fit($('cine-far'), 1, 1); fit($('cine-mirror'), 1, 1); cine.wkey = '';          // give the canvases back
   st.read = cine.was.read; st.sound = cine.was.sound; music();
   $('cine').hidden = true; root.classList.remove('cine-on');
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
