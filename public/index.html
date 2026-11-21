@@ -565,13 +565,14 @@ function glyph(ctx, ch, pk, bold, ox, oy, cell) {
      more the nearer the water comes and the fainter it gets;
    - ripples catching the sky's light, in rows that spread and lengthen towards the viewer;
    - the moon's path: broken glints under the moon, flickering, widening towards the viewer.
-   With reduced motion it is drawn once, still. */
+   With reduced motion it is drawn whole and still. */
 const WATER = 0.24;
 const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
 function river(m, w, h) {
   const t = REDUCED ? 0 : performance.now() / 1000, sc = $('scroll'), sr = sc.getBoundingClientRect();
-  if (sr.bottom < 0 || sr.top > innerHeight) return;
-  const x0 = Math.max(0, Math.floor(sc.scrollLeft) - 60), x1 = Math.min(w.W, Math.ceil(sc.scrollLeft + sc.clientWidth) + 60), vw = x1 - x0;
+  // in motion, only the part in view (and nothing off screen); held still, it may be drawn only once, so all of it
+  if (!REDUCED && (sr.bottom < 0 || sr.top > innerHeight)) return;
+  const x0 = REDUCED ? 0 : Math.max(0, Math.floor(sc.scrollLeft) - 60), x1 = REDUCED ? w.W : Math.min(w.W, Math.ceil(sc.scrollLeft + sc.clientWidth) + 60), vw = x1 - x0;
   const k = w.cv.height / w.H, ink = css('--ink'), soft = css('--soft');
   const mo = document.querySelector('.moon').getBoundingClientRect(), mx = sc.scrollLeft + mo.left + mo.width / 2 - sr.left;
   m.save(); m.clearRect(x0, 0, vw, h);
