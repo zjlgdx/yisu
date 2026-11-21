@@ -92,8 +92,8 @@ nav .links a:hover { border-color: var(--accent); color: var(--ink); }
 .scroll.drag { cursor: grabbing; user-select: none; }
 #roll { filter: var(--glow); }
 .water { display: var(--night-block); height: 1px; background: linear-gradient(90deg, transparent, var(--soft), transparent); opacity: .6; }
-.mirror { display: var(--night-block); opacity: .2; filter: blur(1.2px); margin-top: 2px;
-  -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); }
+.mirror { display: var(--night-block); filter: blur(.6px); margin-top: 2px;
+  -webkit-mask-image: linear-gradient(#000, transparent 92%); mask-image: linear-gradient(#000, transparent 92%); }
 /* How far the writing has got: it fills from the right, the way the columns run. */
 .bar { height: 2px; background: var(--line); margin-top: 8px; }
 .bar i { display: block; height: 100%; background: var(--accent); transform-origin: right center; transform: scaleX(0); }
@@ -559,6 +559,29 @@ function glyph(ctx, ch, pk, bold, ox, oy, cell) {
   for (const st of g) stamp(ctx, g, st, 0, st.n, pk, bold, ox, oy);
   wear(ctx, ch, pk, cell, ox, oy); return true;
 }
+/* By night the scroll stands over a river: a band WATER of the scroll's height, where its columns
+   are mirrored, faint ripples run its whole length, and the moon's light lies on the water under
+   the moon, so the band reads as water before the writing reaches it. Redrawn with the mirror. */
+const WATER = 0.24;
+function river(m, wd, h) {
+  const t = REDUCED ? 0 : performance.now() / 1000, sc = $('scroll'), sr = sc.getBoundingClientRect();
+  const mo = document.querySelector('.moon').getBoundingClientRect(), mx = sc.scrollLeft + mo.left + mo.width / 2 - sr.left;
+  m.save(); m.lineCap = 'round'; m.strokeStyle = css('--soft'); m.lineWidth = 1;
+  for (let i = 0, n = Math.round(wd / 34); i < n; i++) {           // ripples, the same each time, drifting a little
+    const x = (i * 7919 % 997) / 997 * wd + Math.sin(t * 0.7 + i) * 5, y = 5 + (i * 104729 % 89) / 89 * (h - 14), l = 8 + i * 31 % 19;
+    m.globalAlpha = 0.12 + (i * 13 % 7) / 60; m.beginPath(); m.moveTo(x - l / 2, y); m.lineTo(x + l / 2, y); m.stroke();
+  }
+  if (mx > -60 && mx < wd + 60) {                                   // the moon's path on the water
+    const g = m.createRadialGradient(0, 0, 0, 0, 0, h); g.addColorStop(0, css('--ink')); g.addColorStop(1, 'transparent');
+    m.save(); m.translate(mx, 0); m.scale(0.3, 1); m.globalAlpha = 0.1; m.fillStyle = g; m.fillRect(-h, 0, 2 * h, h); m.restore();
+    m.strokeStyle = css('--ink'); m.lineWidth = 1.2;
+    for (let j = 0; j < 14; j++) {
+      const y = 3 + j * (h - 8) / 14, l = (34 - j * 1.9) * (0.45 + 0.55 * Math.abs(Math.sin(t * 1.4 + j * 1.9))), dx = Math.sin(t * 0.9 + j * 2.3) * 6;
+      m.globalAlpha = 0.45 * (1 - j / 15); m.beginPath(); m.moveTo(mx + dx - l / 2, y); m.lineTo(mx + dx + l / 2, y); m.stroke();
+    }
+  }
+  m.restore();
+}
 function fit(cv, w, h, dpr = DPR) {
   cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
   const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
@@ -880,7 +903,7 @@ function init(keep) {
   progress(W.roll); writers.add(W.roll);
   if (had === null) scroller.scrollLeft = scroller.scrollWidth;
   else { const it = W.roll.items[Math.min(had, W.roll.items.length - 1)]; scroller.scrollLeft = Math.max(0, it.x - scroller.clientWidth * 0.3); }
-  W.mirror = dark ? fit($('mirror'), W.roll.W, Math.round(W.roll.H * 0.3)) : null;
+  W.mirror = dark ? fit($('mirror'), W.roll.W, Math.round(W.roll.H * WATER)) : null;
   // the line the name comes from, with its last two characters written as it scrolls into view
   const line = '寄蜉蝣於天地，渺滄海之一粟。';
   W.quote = new Writer($('quote'), { text: line, pen: st.pen, cell: narrow() ? 38 : 54, gap: narrow() ? 12 : 20, rows: 7, pad: 6, pre: [...line].length - 3, color: css('--grain'), speed: 1500 });
@@ -964,8 +987,11 @@ function tick(dt) {
   rain.sparks = rain.sparks.filter(s => s.life > 0); t.globalAlpha = 1;
   rain.clock += dt;
   if (W.mirror && (rain.clock > 240 || dt === 0)) {      // the text again, upside down in the water
-    rain.clock = 0; const m = W.mirror, w = W.roll, h = Math.round(w.H * 0.3);
-    m.save(); m.clearRect(0, 0, w.W, h); m.translate(0, h); m.scale(1, -0.3); m.drawImage(w.cv, 0, 0, w.W, w.H); m.restore();
+    rain.clock = 0; const m = W.mirror, w = W.roll, h = Math.round(w.H * WATER), k = w.cv.height / w.H;
+    // the columns' feet, upside down at their own size (squeezed into the band they read as smudges)
+    m.save(); m.clearRect(0, 0, w.W, h); m.globalAlpha = 0.3; m.translate(0, h); m.scale(1, -1);
+    m.drawImage(w.cv, 0, (w.H - h) * k, w.cv.width, h * k, 0, 0, w.W, h); m.restore();
+    river(m, w.W, h);
   }
   const want = vo.live && !vo.el.paused ? 0.22 : 0.6;     // the music steps back for the voice
   if (bgm.out && Math.abs(bgm.level - want) > 0.005) { bgm.level += (want - bgm.level) * Math.min(1, dt / 350); bgm.out.gain.value = bgm.level; }
