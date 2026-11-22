@@ -134,6 +134,8 @@ The site is static files and a small Worker at [yisu.aixie.de](https://yisu.aixi
 npx wrangler deploy
 ```
 
+Deploy with wrangler's own login. A `CLOUDFLARE_API_TOKEN` in the environment replaces that login, and one scoped to reading analytics fails the deploy with "No access to the specified service".
+
 `public/fonts/full/` is not in the repository, so make it first (`tools/webfonts.py FONTS full`). Without it, the box to type in falls back to the reader's own fonts for characters the page doesn't already show. To try the Worker before deploying, `npx wrangler dev` serves the whole site with `/e` at `http://localhost:8787`.
 
 ## History
