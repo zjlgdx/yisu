@@ -81,8 +81,22 @@ def align(want, heard, same):
     return pairs[::-1]
 
 
+def pinned(table):
+    """Add the readings tools/audio.py pins (會稽 guì jī): the voice is told to say them, and Unihan may lack them."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('audio', Path(__file__).with_name('audio.py'))
+    audio = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(audio)
+    pins = audio.TONES + [p for v in audio.TONES_MORE.values() for p in v] + [p for v in audio.PINS.values() for p in v]
+    for pin in pins:
+        word, sounds = pin.split('/')
+        for ch, sound in zip(word, re.findall(r'\(([a-z]+)\d\)', sounds)):
+            table.setdefault(ch, set()).add(sound)
+    return table
+
+
 def main():
-    table = readings(sys.argv[1])
+    table = pinned(readings(sys.argv[1]))
     model = next((m for m in MODELS if m.exists()), None)
     if not model:
         sys.exit('no whisper model in ~/.local/share/whisper/')
@@ -103,13 +117,19 @@ def main():
             if only and name not in only:
                 continue
             want = [SAY.get(c, c) for c in sent if '㐀' <= c <= '鿿']
-            with tempfile.TemporaryDirectory() as d:
-                wav = str(Path(d) / 'a.wav')
-                subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', str(VO / f'{name}.mp3'), '-af', 'apad=pad_dur=0.6',
-                                '-ar', '16000', '-ac', '1', wav], check=True)
-                out = subprocess.run(['whisper-cli', '-m', str(model), '-l', 'zh', '-nt', '-np', wav], capture_output=True, text=True).stdout
-            heard = [c for c in out if '㐀' <= c <= '鿿']
-            marks = ''.join('-' if h is None else same(w, h) for w, h in zip(want, align(want, heard, same)))
+            tries = []
+            # on its own and with silence after it, and the better of the two (timestamps on: with -nt,
+            # whisper-cli prints only a clip's last segment)
+            for pad in ([], ['-af', 'apad=pad_dur=0.6']):
+                with tempfile.TemporaryDirectory() as d:
+                    wav = str(Path(d) / 'a.wav')
+                    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', str(VO / f'{name}.mp3'), *pad,
+                                    '-ar', '16000', '-ac', '1', wav], check=True)
+                    out = subprocess.run(['whisper-cli', '-m', str(model), '-l', 'zh', '-np', wav], capture_output=True, text=True).stdout
+                heard = [c for c in out if '㐀' <= c <= '鿿']
+                marks = ''.join('-' if h is None else same(w, h) for w, h in zip(want, align(want, heard, same)))
+                tries.append((marks.count('x') + marks.count('-'), heard, marks))
+            _, heard, marks = min(tries, key=lambda t: t[0])
             total += 1
             flag = 'x' in marks or '-' in marks
             if flag:
